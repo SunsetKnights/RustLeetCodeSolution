@@ -12,11 +12,24 @@ impl Solution {
         let size = nums.len();
         let mut left;
         let mut right;
-        for i in 0..size - 3 {
+        let mut distance: i32 = 0x7FFFFFFF;
+        for i in 0..size - 2 {
             left = i + 1;
             right = size - 1;
-            while left < right {}
+            while left < right {
+                let temp = target - changable[i] - changable[left] - changable[right];
+                if temp == 0 {
+                    return target;
+                } else if temp < 0 {
+                    right -= 1;
+                } else {
+                    left += 1;
+                }
+                if temp.abs() < distance.abs() {
+                    distance = temp;
+                }
+            }
         }
-        1
+        target - distance
     }
 }
