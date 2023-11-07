@@ -7,8 +7,37 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug",
-            "program": "${workspaceFolder}/<executable file>",
+            "name": "Debug executable 'leetcode'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=leetcode",
+                    "--package=leetcode"
+                ],
+                "filter": {
+                    "name": "leetcode",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'leetcode'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=leetcode",
+                    "--package=leetcode"
+                ],
+                "filter": {
+                    "name": "leetcode",
+                    "kind": "bin"
+                }
+            },
             "args": [],
             "cwd": "${workspaceFolder}"
         }
