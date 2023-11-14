@@ -1,9 +1,9 @@
-pub mod successful_pairs;
+pub mod find_the_city;
 
 fn main() {
-    let spells = vec![3, 1, 2];
-    let potions = vec![8, 5, 8];
-    let success = 16;
-    let result = successful_pairs::Solution::successful_pairs(spells, potions, success);
-    println!("{:?}", result);
+    let n = 4;
+    let edges = vec![vec![0, 1, 3], vec![1, 2, 1], vec![1, 3, 4], vec![2, 3, 1]];
+    let distance_threshold = 4;
+    let result = find_the_city::Solution::find_the_city(n, edges, distance_threshold);
+    println!("{}", result);
 }
