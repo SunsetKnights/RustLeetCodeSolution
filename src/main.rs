@@ -1,9 +1,9 @@
-pub mod find_the_city;
+pub mod maximum_sum_queries;
 
 fn main() {
-    let n = 4;
-    let edges = vec![vec![0, 1, 3], vec![1, 2, 1], vec![1, 3, 4], vec![2, 3, 1]];
-    let distance_threshold = 4;
-    let result = find_the_city::Solution::find_the_city(n, edges, distance_threshold);
-    println!("{}", result);
+    let nums1 = vec![4, 3, 1, 2];
+    let nums2 = vec![2, 4, 9, 5];
+    let queries = vec![vec![4, 1], vec![1, 3], vec![2, 5]];
+    let result = maximum_sum_queries::Solution::maximum_sum_queries(nums1, nums2, queries);
+    println!("{:?}", result);
 }
