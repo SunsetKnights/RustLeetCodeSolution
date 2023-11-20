@@ -1,8 +1,7 @@
-pub mod max_sum_of_three_subarrays;
+pub mod max_sub_array;
 
 fn main() {
-    let nums = vec![1, 2, 1, 2, 6, 7, 5, 1];
-    let k = 2;
-    let result = max_sum_of_three_subarrays::Solution::max_sum_of_three_subarrays(nums, k);
-    println!("{:?}", result);
+    let nums = vec![-2, 1, -3, 4, -1, 2, 1, -5, 4];
+    let result = max_sub_array::Solution::max_sub_array(nums);
+    println!("{}", result);
 }
