@@ -1,7 +1,7 @@
-pub mod max_sub_array;
+pub mod entity_parser;
 
 fn main() {
-    let nums = vec![-2, 1, -3, 4, -1, 2, 1, -5, 4];
-    let result = max_sub_array::Solution::max_sub_array(nums);
+    let text = String::from("&amp; is an HTML entity but &ambassador; is not.");
+    let result = entity_parser::Solution::entity_parser(text);
     println!("{}", result);
 }
