@@ -1,14 +1,9 @@
-pub mod pseudo_palindromic_paths;
-use std::{cell::RefCell, rc::Rc};
-
-use pseudo_palindromic_paths::*;
+pub mod first_complete_index;
+use first_complete_index::*;
 
 fn main() {
-    let a = Some(Rc::new(RefCell::new(TreeNode::new(9))));
-    let c = Some(Rc::new(RefCell::new(TreeNode::new(9))));
-    let mut b = TreeNode::new(9);
-    b.left = a;
-    b.right = c;
-    let result = Solution::pseudo_palindromic_paths(Some(Rc::new(RefCell::new(b))));
+    let arr = vec![1, 3, 4, 2];
+    let mat = vec![vec![1, 4], vec![2, 3]];
+    let result = Solution::first_complete_index(arr, mat);
     println!("{:?}", result);
 }
