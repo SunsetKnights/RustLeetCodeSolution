@@ -1,9 +1,14 @@
-pub mod first_complete_index;
-use first_complete_index::*;
+pub mod smallest_infinite_set;
+use smallest_infinite_set::*;
 
 fn main() {
-    let arr = vec![1, 3, 4, 2];
-    let mat = vec![vec![1, 4], vec![2, 3]];
-    let result = Solution::first_complete_index(arr, mat);
-    println!("{:?}", result);
+    let mut t = SmallestInfiniteSet::new();
+    t.add_back(2);
+    t.pop_smallest();
+    t.pop_smallest();
+    t.pop_smallest();
+    t.add_back(1);
+    t.pop_smallest();
+    t.pop_smallest();
+    t.pop_smallest();
 }
