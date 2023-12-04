@@ -1,14 +1,6 @@
-pub mod smallest_infinite_set;
-use smallest_infinite_set::*;
+pub mod convert_bst;
+use convert_bst::*;
 
 fn main() {
-    let mut t = SmallestInfiniteSet::new();
-    t.add_back(2);
-    t.pop_smallest();
-    t.pop_smallest();
-    t.pop_smallest();
-    t.add_back(1);
-    t.pop_smallest();
-    t.pop_smallest();
-    t.pop_smallest();
+    let result = Solution::convert_bst(None);
 }
