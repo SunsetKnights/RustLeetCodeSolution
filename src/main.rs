@@ -1,8 +1,8 @@
-pub mod minimum_effort_path;
-use minimum_effort_path::*;
+pub mod possible_to_stamp;
+use possible_to_stamp::*;
 
 fn main() {
-    let heights = vec![vec![1, 2, 3], vec![3, 8, 4], vec![5, 3, 5]];
-    let result = Solution::minimum_effort_path(heights);
+    let grid = vec![vec![0, 0, 0, 0], vec![0, 0, 0, 0], vec![0, 0, 0, 1]];
+    let result = Solution::possible_to_stamp(grid, 3, 3);
     println!("{}", result);
 }
