@@ -1,8 +1,11 @@
-pub mod possible_to_stamp;
-use possible_to_stamp::*;
+pub mod range_module;
+use range_module::*;
 
 fn main() {
-    let grid = vec![vec![0, 0, 0, 0], vec![0, 0, 0, 0], vec![0, 0, 0, 1]];
-    let result = Solution::possible_to_stamp(grid, 3, 3);
-    println!("{}", result);
+    let mut range = RangeModule::new();
+    range.add_range(10, 20);
+    range.remove_range(14, 16);
+    range.query_range(10, 14);
+    range.query_range(13, 15);
+    range.query_range(16, 17);
 }
