@@ -1,11 +1,17 @@
-pub mod range_module;
-use range_module::*;
+pub mod solve_sudoku;
+use solve_sudoku::*;
 
 fn main() {
-    let mut range = RangeModule::new();
-    range.add_range(10, 20);
-    range.remove_range(14, 16);
-    range.query_range(10, 14);
-    range.query_range(13, 15);
-    range.query_range(16, 17);
+    let mut board = vec![
+        vec!['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+        vec!['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+        vec!['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+        vec!['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+        vec!['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+        vec!['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+        vec!['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+        vec!['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+        vec!['.', '.', '.', '.', '8', '.', '.', '7', '9'],
+    ];
+    Solution::solve_sudoku(&mut board);
 }
