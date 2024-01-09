@@ -1,14 +1,12 @@
-pub mod max_students;
-use max_students::*;
+pub mod trie;
+use trie::*;
 
 fn main() {
-    let seats = vec![
-        vec!['#', '.', '.', '.', '#'],
-        vec!['.', '#', '.', '#', '.'],
-        vec!['.', '.', '#', '.', '.'],
-        vec!['.', '#', '.', '#', '.'],
-        vec!['#', '.', '.', '.', '#'],
-    ];
-    let ret = Solution::max_students(seats);
-    println!("{ret}");
+    let mut t = Trie::new();
+    t.insert("apple".to_string());
+    t.search("apple".to_string());
+    t.search("app".to_string());
+    t.starts_with("app".to_string());
+    t.insert("app".to_string());
+    t.search("app".to_string());
 }
