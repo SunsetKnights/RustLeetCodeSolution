@@ -1,9 +1,18 @@
-pub mod tree_ancestor;
-use tree_ancestor::*;
+pub mod min_operations_queries;
+use min_operations_queries::*;
 
 fn main() {
-    let test = TreeAncestor::new(7, vec![-1, 0, 0, 1, 1, 2, 2]);
-    test.get_kth_ancestor(3, 1);
-    test.get_kth_ancestor(5, 2);
-    test.get_kth_ancestor(6, 3);
+    let ret = Solution::min_operations_queries(
+        7,
+        vec![
+            vec![0, 1, 1],
+            vec![1, 2, 1],
+            vec![2, 3, 1],
+            vec![3, 4, 2],
+            vec![4, 5, 2],
+            vec![5, 6, 2],
+        ],
+        vec![vec![0, 3], vec![3, 6], vec![2, 6], vec![0, 6]],
+    );
+    println!("{:#?}", ret);
 }
