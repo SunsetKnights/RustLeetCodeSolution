@@ -16,20 +16,15 @@ pub struct TreeAncestor {
  */
 impl TreeAncestor {
     pub fn new(n: i32, parent: Vec<i32>) -> Self {
-        let mut m = 32;
-        for i in 0..31 {
-            if 1 << i > n {
-                m = i;
-                break;
-            }
-        }
-        let mut inner = vec![Vec::with_capacity(m as usize); n as usize];
+        let n = n as usize;
+        let m = (64 - n.leading_zeros()) as usize;
+        let mut inner = vec![Vec::with_capacity(m); n as usize];
         parent
             .iter()
             .enumerate()
             .for_each(|(idx, &n)| inner[idx].push(n));
-        for i in 1..m as usize {
-            for j in 0..n as usize {
+        for i in 1..m {
+            for j in 0..n {
                 let father = inner[j][i - 1];
                 if father == -1 {
                     inner[j].push(-1);
@@ -42,18 +37,12 @@ impl TreeAncestor {
         Self { inner }
     }
 
-    pub fn get_kth_ancestor(&self, node: i32, k: i32) -> i32 {
-        let mut p = self.inner[node as usize][0];
-        for i in 1..31 {
-            if k >> i == 0 {
-                break;
-            }
-            if k >> i & 1 == 1 {
-                p = self.inner[p as usize][i];
-                if p == -1 {
-                    return -1;
-                }
-            }
+    pub fn get_kth_ancestor(&self, node: i32, mut k: i32) -> i32 {
+        let mut p = node;
+        while k != 0 && p != -1 {
+            let idx = k.trailing_zeros() as usize;
+            p = self.inner[p as usize][idx];
+            k &= k - 1;
         }
         p
     }
