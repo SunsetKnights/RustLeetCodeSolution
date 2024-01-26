@@ -20,21 +20,16 @@ impl Solution {
         edges: Vec<Vec<i32>>,
         queries: Vec<Vec<i32>>,
     ) -> Vec<i32> {
-        let mut graphics = vec![Vec::new(); n as usize];
+        let n = n as usize;
+        let mut graphics = vec![Vec::new(); n];
         for edge in edges {
             graphics[edge[0] as usize].push((edge[1], edge[2] - 1));
             graphics[edge[1] as usize].push((edge[0], edge[2] - 1));
         }
-        let mut m = 32;
-        for i in 0..32 {
-            if 1 << i > n {
-                m = i;
-                break;
-            }
-        }
-        let mut parents = vec![vec![-1; m as usize]; n as usize];
-        let mut w_counter = vec![vec![[0; 26]; m as usize]; n as usize];
-        let mut deep = vec![0; n as usize];
+        let m = (64 - n.leading_zeros()) as usize;
+        let mut parents = vec![vec![-1; m]; n];
+        let mut w_counter = vec![vec![[0; 26]; m]; n];
+        let mut deep = vec![0; n];
         fn dfs(
             node: i32,
             father: i32,
@@ -79,13 +74,7 @@ impl Solution {
             let mut temp_w_counter = [0; 26];
             let mut k = deep[y] - deep[x];
             while k != 0 {
-                let mut idx = 32;
-                for i in 0..32 {
-                    if k >> i & 1 == 1 {
-                        idx = i;
-                        break;
-                    }
-                }
+                let idx = k.trailing_zeros() as usize;
                 let parent = parents[y][idx];
                 for i in 0..26 {
                     temp_w_counter[i] += w_counter[y][idx][i];
