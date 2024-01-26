@@ -1,21 +1,9 @@
-pub mod delete_duplicates;
-use delete_duplicates::*;
+pub mod tree_ancestor;
+use tree_ancestor::*;
 
 fn main() {
-    let link_list_val = [1, 2, 3, 3, 4, 4, 5];
-    let mut head = None;
-    for &val in link_list_val.iter().rev() {
-        let mut new_node = ListNode::new(val);
-        new_node.next = head;
-        head = Some(Box::new(new_node));
-    }
-    let mut result = Solution::delete_duplicates(head);
-    let mut print_string = String::new();
-    while let Some(node) = result {
-        print_string.push_str(node.val.to_string().as_str());
-        print_string.push_str("->");
-        result = node.next;
-    }
-    print_string.push_str("None");
-    println!("{print_string}");
+    let test = TreeAncestor::new(7, vec![-1, 0, 0, 1, 1, 2, 2]);
+    test.get_kth_ancestor(3, 1);
+    test.get_kth_ancestor(5, 2);
+    test.get_kth_ancestor(6, 3);
 }
