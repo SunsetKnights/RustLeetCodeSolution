@@ -1,4 +1,3 @@
-// Definition for singly-linked list.
 #[derive(PartialEq, Eq, Clone, Debug)]
 pub struct ListNode {
     pub val: i32,
@@ -12,14 +11,26 @@ impl ListNode {
     }
 }
 
+impl PartialOrd for ListNode {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(&other))
+    }
+}
+
+impl Ord for ListNode {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.val.cmp(&self.val)
+    }
+}
+
 pub struct Solution;
-/**
- * 82. 删除排序链表中的重复元素 II
- * 给定一个已排序的链表的头 head，
- * 删除原始链表中所有重复数字的节点，只留下不同的数字 。
- * 返回已排序的链表 。
- */
 impl Solution {
+    /**
+     * 82. 删除排序链表中的重复元素 II
+     * 给定一个已排序的链表的头 head，
+     * 删除原始链表中所有重复数字的节点，只留下不同的数字 。
+     * 返回已排序的链表 。
+     */
     pub fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
         let mut result = Box::new(ListNode::new(0));
         result.next = head;
@@ -47,6 +58,29 @@ impl Solution {
             break;
         }
         result.next
+    }
+
+    /**
+     * 23. 合并 K 个升序链表
+     * 给你一个链表数组，每个链表都已经按升序排列。
+     * 请你将所有链表合并到一个升序链表中，返回合并后的链表。
+     */
+    pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
+        let mut node = None;
+        let mut cur = &mut node;
+        let mut heap = BinaryHeap::new();
+        for list in lists.into_iter() {
+            if let Some(x) = list {
+                heap.push(x);
+            }
+        }
+        while let Some(mut x) = heap.pop() {
+            if let Some(y) = x.next.take() {
+                heap.push(y);
+            }
+            cur = &mut cur.insert(x).next;
+        }
+        node
     }
 }
 
