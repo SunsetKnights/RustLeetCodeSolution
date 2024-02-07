@@ -26,8 +26,11 @@ impl TreeNode {
         let mut queue = VecDeque::new();
         let root = Rc::new(RefCell::new(Self::new(data[0])));
         queue.push_back(Rc::clone(&root));
+        let mut curr_node = Rc::clone(&root);
         for idx in 1..data.len() {
-            let curr_node = queue.pop_front().unwrap();
+            if idx & 1 == 1 {
+                curr_node = queue.pop_front().unwrap();
+            }
             if data[idx] != i32::MAX {
                 let child = Rc::new(RefCell::new(TreeNode::new(data[idx])));
                 queue.push_back(Rc::clone(&child));
@@ -45,7 +48,6 @@ impl TreeNode {
         let mut ret = Vec::new();
         if let Some(root) = root {
             let mut queue = VecDeque::new();
-            ret.push(root.borrow().val);
             queue.push_back(root);
             while let Some(node) = queue.pop_front() {
                 ret.push(node.borrow().val);
@@ -179,6 +181,36 @@ impl Solution {
         }
         root
     }
+
+    /**
+     * 872. 叶子相似的树
+     * 如果有两棵二叉树的叶值序列是相同，那么我们就认为它们是 叶相似 的。
+     * 如果给定的两个根结点分别为 root1 和 root2 的树是叶相似的，则返回 true；否则返回 false 。
+     */
+    pub fn leaf_similar(
+        root1: Option<Rc<RefCell<TreeNode>>>,
+        root2: Option<Rc<RefCell<TreeNode>>>,
+    ) -> bool {
+        fn dfs(node: Rc<RefCell<TreeNode>>, leaf: &mut Vec<i32>) {
+            let mut is_leaf = true;
+            if node.borrow().left.is_some() {
+                is_leaf = false;
+                dfs(Rc::clone(node.borrow().left.as_ref().unwrap()), leaf);
+            }
+            if node.borrow().right.is_some() {
+                is_leaf = false;
+                dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), leaf);
+            }
+            if is_leaf {
+                leaf.push(node.borrow().val);
+            }
+        }
+        let mut leaf_1 = Vec::new();
+        let mut leaf_2 = Vec::new();
+        dfs(root1.unwrap(), &mut leaf_1);
+        dfs(root2.unwrap(), &mut leaf_2);
+        leaf_1 == leaf_2
+    }
 }
 
 #[cfg(test)]
@@ -188,10 +220,14 @@ mod tests {
 
     #[test]
     fn test_solution() {
-        let tree_val = [3, 5, 1, 6, 2, 9, 8, i32::MAX, i32::MAX, 7, 4];
+        let tree_val = [5, 4, 9, 1, 10, i32::MAX, 7];
         let mut root = TreeNode::create_from_vec(tree_val.to_vec());
         root = Solution::replace_value_in_tree(root);
         let result = TreeNode::to_vec(root);
-        assert_eq!(result, vec![1, 2, 5], "The results are not as expected.");
+        assert_eq!(
+            result,
+            vec![0, 0, 0, 7, 7, 11],
+            "The results are not as expected."
+        );
     }
 }
