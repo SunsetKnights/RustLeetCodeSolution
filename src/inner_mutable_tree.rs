@@ -8,6 +8,7 @@ pub struct TreeNode {
     pub left: Option<Rc<RefCell<TreeNode>>>,
     pub right: Option<Rc<RefCell<TreeNode>>>,
 }
+#[allow(unused)]
 impl TreeNode {
     #[inline]
     fn new(val: i32) -> Self {
@@ -210,6 +211,58 @@ impl Solution {
         dfs(root1.unwrap(), &mut leaf_1);
         dfs(root2.unwrap(), &mut leaf_2);
         leaf_1 == leaf_2
+    }
+
+    /**
+     * 993. 二叉树的堂兄弟节点
+     * 在二叉树中，根节点位于深度 0 处，每个深度为 k 的节点的子节点位于深度 k+1 处。
+     * 如果二叉树的两个节点深度相同，但 父节点不同 ，则它们是一对堂兄弟节点。
+     * 我们给出了具有唯一值的二叉树的根节点 root ，以及树中两个不同节点的值 x 和 y 。
+     * 只有与值 x 和 y 对应的节点是堂兄弟节点时，才返回 true 。否则，返回 false。
+     */
+    pub fn is_cousins(root: Option<Rc<RefCell<TreeNode>>>, x: i32, y: i32) -> bool {
+        fn dfs(
+            from: i32,
+            layer: i32,
+            node: Rc<RefCell<TreeNode>>,
+            x: i32,
+            y: i32,
+            x_info: &mut (i32, i32),
+            y_info: &mut (i32, i32),
+        ) {
+            if node.borrow().val == x {
+                *x_info = (layer, from);
+            }
+            if node.borrow().val == y {
+                *y_info = (layer, from);
+            }
+            if node.borrow().left.is_some() {
+                dfs(
+                    node.borrow().val,
+                    layer + 1,
+                    Rc::clone(node.borrow().left.as_ref().unwrap()),
+                    x,
+                    y,
+                    x_info,
+                    y_info,
+                );
+            }
+            if node.borrow().right.is_some() {
+                dfs(
+                    node.borrow().val,
+                    layer + 1,
+                    Rc::clone(node.borrow().right.as_ref().unwrap()),
+                    x,
+                    y,
+                    x_info,
+                    y_info,
+                );
+            }
+        }
+        let mut x_info = (-1, 0);
+        let mut y_info = (-1, 0);
+        dfs(0, 0, root.unwrap(), x, y, &mut x_info, &mut y_info);
+        x_info.0 == y_info.0 && x_info.1 != y_info.1
     }
 }
 
