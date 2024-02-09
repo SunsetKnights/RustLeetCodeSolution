@@ -296,7 +296,7 @@ impl Solution {
             }
             let mut right_find = false;
             if node.borrow().right.is_some() {
-                left_find = dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q, ret);
+                right_find = dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q, ret);
             }
             if (curr_find && (left_find || right_find)) || (left_find && right_find) {
                 *ret = Some(node);
@@ -311,6 +311,36 @@ impl Solution {
             &mut ret,
         );
         ret
+    }
+
+    /**
+     * 235. 二叉搜索树的最近公共祖先
+     * 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+     * 百度百科中最近公共祖先的定义为：
+     * “对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，
+     * 满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+     */
+    pub fn lowest_common_ancestor_search_tree(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        p: Option<Rc<RefCell<TreeNode>>>,
+        q: Option<Rc<RefCell<TreeNode>>>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        // p > q
+        fn dfs(node: Rc<RefCell<TreeNode>>, p: i32, q: i32) -> Option<Rc<RefCell<TreeNode>>> {
+            if node.borrow().val < p {
+                dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q)
+            } else if node.borrow().val > q {
+                dfs(Rc::clone(node.borrow().left.as_ref().unwrap()), p, q)
+            } else {
+                Some(node)
+            }
+        }
+        let mut p = p.unwrap().borrow().val;
+        let mut q = q.unwrap().borrow().val;
+        if p < q {
+            std::mem::swap(&mut p, &mut q);
+        }
+        dfs(root.unwrap(), p, q)
     }
 }
 
