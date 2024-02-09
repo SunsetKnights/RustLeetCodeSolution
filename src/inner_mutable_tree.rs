@@ -11,7 +11,7 @@ pub struct TreeNode {
 #[allow(unused)]
 impl TreeNode {
     #[inline]
-    fn new(val: i32) -> Self {
+    pub fn new(val: i32) -> Self {
         TreeNode {
             val,
             left: None,
@@ -263,6 +263,54 @@ impl Solution {
         let mut y_info = (-1, 0);
         dfs(0, 0, root.unwrap(), x, y, &mut x_info, &mut y_info);
         x_info.0 == y_info.0 && x_info.1 != y_info.1
+    }
+
+    /**
+     * 236. 二叉树的最近公共祖先
+     * 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先。
+     * 百度百科中最近公共祖先的定义为：
+     * “对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先
+     * 且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+     */
+    pub fn lowest_common_ancestor(
+        root: Option<Rc<RefCell<TreeNode>>>,
+        p: Option<Rc<RefCell<TreeNode>>>,
+        q: Option<Rc<RefCell<TreeNode>>>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        fn dfs(
+            node: Rc<RefCell<TreeNode>>,
+            p: i32,
+            q: i32,
+            ret: &mut Option<Rc<RefCell<TreeNode>>>,
+        ) -> bool {
+            if ret.is_some() {
+                return false;
+            }
+            let mut curr_find = false;
+            if node.borrow().val == p || node.borrow().val == q {
+                curr_find = true;
+            }
+            let mut left_find = false;
+            if node.borrow().left.is_some() {
+                left_find = dfs(Rc::clone(node.borrow().left.as_ref().unwrap()), p, q, ret);
+            }
+            let mut right_find = false;
+            if node.borrow().right.is_some() {
+                left_find = dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q, ret);
+            }
+            if (curr_find && (left_find || right_find)) || (left_find && right_find) {
+                *ret = Some(node);
+            }
+            curr_find || left_find || right_find
+        }
+        let mut ret = None;
+        dfs(
+            root.unwrap(),
+            p.unwrap().borrow().val,
+            q.unwrap().borrow().val,
+            &mut ret,
+        );
+        ret
     }
 }
 
