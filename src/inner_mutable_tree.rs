@@ -325,7 +325,7 @@ impl Solution {
         p: Option<Rc<RefCell<TreeNode>>>,
         q: Option<Rc<RefCell<TreeNode>>>,
     ) -> Option<Rc<RefCell<TreeNode>>> {
-        // p > q
+        // p < q
         fn dfs(node: Rc<RefCell<TreeNode>>, p: i32, q: i32) -> Option<Rc<RefCell<TreeNode>>> {
             if node.borrow().val < p {
                 dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q)
@@ -337,10 +337,51 @@ impl Solution {
         }
         let mut p = p.unwrap().borrow().val;
         let mut q = q.unwrap().borrow().val;
-        if p < q {
+        if p > q {
             std::mem::swap(&mut p, &mut q);
         }
         dfs(root.unwrap(), p, q)
+    }
+
+    /**
+     * 987. 二叉树的垂序遍历
+     * 给你二叉树的根结点 root ，请你设计算法计算二叉树的 垂序遍历 序列。
+     * 对位于 (row, col) 的每个结点而言，其左右子结点分别位于 (row + 1, col - 1) 和 (row + 1, col + 1) 。
+     * 树的根结点位于 (0, 0) 。
+     * 二叉树的 垂序遍历 从最左边的列开始直到最右边的列结束，按列索引每一列上的所有结点，形成一个按出现位置从上到下排序的有序列表。
+     * 如果同行同列上有多个结点，则按结点的值从小到大进行排序。
+     * 返回二叉树的 垂序遍历 序列。
+     */
+    pub fn vertical_traversal(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        fn dfs(node: Rc<RefCell<TreeNode>>, row: i32, col: i32, info: &mut Vec<(i32, i32, i32)>) {
+            info.push((row, col, node.borrow().val));
+            if let Some(left) = node.borrow_mut().left.take() {
+                dfs(left, row + 1, col - 1, info);
+            }
+            if let Some(right) = node.borrow_mut().right.take() {
+                dfs(right, row + 1, col + 1, info);
+            }
+        }
+        let mut info = Vec::new();
+        dfs(root.unwrap(), 0, 0, &mut info);
+        info.sort_by(|a, b| {
+            if a.1 != b.1 {
+                a.1.cmp(&b.1)
+            } else if a.0 != b.0 {
+                a.0.cmp(&b.0)
+            } else {
+                a.2.cmp(&b.2)
+            }
+        });
+        let mut ret = Vec::new();
+        let mut curr_col = i32::MAX;
+        for i in info {
+            if i.1 != curr_col {
+                ret.push(Vec::new());
+            }
+            ret.last_mut().unwrap().push(i.2);
+        }
+        ret
     }
 }
 
