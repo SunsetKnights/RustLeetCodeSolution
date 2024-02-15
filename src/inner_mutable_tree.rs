@@ -383,6 +383,39 @@ impl Solution {
         }
         ret
     }
+
+    /**
+     * 107. 二叉树的层序遍历 II
+     * 给你二叉树的根节点 root ，返回其节点值 自底向上的层序遍历 。 （即按从叶子节点所在层到根节点所在的层，逐层从左向右遍历）
+     */
+    pub fn level_order_bottom(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        let mut ret = Vec::new();
+        let mut queue = VecDeque::new();
+        if let Some(node) = root {
+            queue.push_back(node);
+        }
+        loop {
+            match queue.len() {
+                0 => break,
+                len => {
+                    let mut curr_level = Vec::with_capacity(len);
+                    for _ in 0..len {
+                        let node = queue.pop_front().unwrap();
+                        curr_level.push(node.borrow().val);
+                        if let Some(left) = node.borrow_mut().left.take() {
+                            queue.push_back(left);
+                        };
+                        if let Some(right) = node.borrow_mut().right.take() {
+                            queue.push_back(right);
+                        };
+                    }
+                    ret.push(curr_level);
+                }
+            }
+        }
+        ret.reverse();
+        ret
+    }
 }
 
 #[cfg(test)]
