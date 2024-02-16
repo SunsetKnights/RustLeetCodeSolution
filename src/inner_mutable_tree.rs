@@ -394,26 +394,52 @@ impl Solution {
         if let Some(node) = root {
             queue.push_back(node);
         }
-        loop {
-            match queue.len() {
-                0 => break,
-                len => {
-                    let mut curr_level = Vec::with_capacity(len);
-                    for _ in 0..len {
-                        let node = queue.pop_front().unwrap();
-                        curr_level.push(node.borrow().val);
-                        if let Some(left) = node.borrow_mut().left.take() {
-                            queue.push_back(left);
-                        };
-                        if let Some(right) = node.borrow_mut().right.take() {
-                            queue.push_back(right);
-                        };
-                    }
-                    ret.push(curr_level);
-                }
+        while queue.len() != 0 {
+            let mut curr_level = Vec::with_capacity(queue.len());
+            for _ in 0..queue.len() {
+                let node = queue.pop_front().unwrap();
+                curr_level.push(node.borrow().val);
+                if let Some(left) = node.borrow_mut().left.take() {
+                    queue.push_back(left);
+                };
+                if let Some(right) = node.borrow_mut().right.take() {
+                    queue.push_back(right);
+                };
             }
+            ret.push(curr_level);
         }
         ret.reverse();
+        ret
+    }
+
+    /**
+     * 103. 二叉树的锯齿形层序遍历
+     * 给你二叉树的根节点 root ，返回其节点值的 锯齿形层序遍历 。
+     * （即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。
+     */
+    pub fn zigzag_level_order(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<Vec<i32>> {
+        let mut ret = Vec::new();
+        let mut queue = VecDeque::new();
+        if let Some(node) = root {
+            queue.push_back(node);
+        }
+        while queue.len() != 0 {
+            let mut curr_level = Vec::with_capacity(queue.len());
+            for _ in 0..queue.len() {
+                let node = queue.pop_front().unwrap();
+                curr_level.push(node.borrow().val);
+                if let Some(left) = node.borrow_mut().left.take() {
+                    queue.push_back(left);
+                };
+                if let Some(right) = node.borrow_mut().right.take() {
+                    queue.push_back(right);
+                };
+            }
+            if ret.len() & 1 == 1 {
+                curr_level.reverse();
+            }
+            ret.push(curr_level);
+        }
         ret
     }
 }
