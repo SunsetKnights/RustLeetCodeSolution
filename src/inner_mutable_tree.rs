@@ -442,6 +442,25 @@ impl Solution {
         }
         ret
     }
+
+    /**
+     * 105. 从前序与中序遍历序列构造二叉树
+     * 给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历，
+     * inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。
+     */
+    pub fn build_tree(preorder: Vec<i32>, inorder: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
+        fn build(preor: &[i32], inor: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
+            if inor.len() == 0 {
+                return None;
+            }
+            let root_idx = (0..inor.len()).find(|idx| inor[*idx] == preor[0]).unwrap();
+            let mut root = TreeNode::new(preor[0]);
+            root.left = build(&preor[1..=root_idx], &inor[0..root_idx]);
+            root.right = build(&preor[root_idx + 1..], &inor[root_idx + 1..]);
+            Some(Rc::new(RefCell::new(root)))
+        }
+        build(&preorder[..], &inorder[..])
+    }
 }
 
 #[cfg(test)]
