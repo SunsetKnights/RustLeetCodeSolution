@@ -461,6 +461,31 @@ impl Solution {
         }
         build(&preorder[..], &inorder[..])
     }
+
+    /**
+     * 106. 从中序与后序遍历序列构造二叉树
+     * 给定两个整数数组 inorder 和 postorder,
+     * 其中 inorder 是二叉树的中序遍历，
+     * postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。
+     */
+    pub fn build_tree_postorder(
+        inorder: Vec<i32>,
+        postorder: Vec<i32>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        fn build(postor: &[i32], inor: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
+            if inor.len() == 0 {
+                return None;
+            }
+            let root_idx = (0..inor.len())
+                .find(|idx| inor[*idx] == postor[postor.len() - 1])
+                .unwrap();
+            let mut root = TreeNode::new(postor[postor.len() - 1]);
+            root.left = build(&postor[0..root_idx], &inor[0..root_idx]);
+            root.right = build(&postor[root_idx..postor.len() - 1], &inor[root_idx + 1..]);
+            Some(Rc::new(RefCell::new(root)))
+        }
+        build(&postorder[..], &inorder[..])
+    }
 }
 
 #[cfg(test)]
