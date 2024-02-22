@@ -486,6 +486,39 @@ impl Solution {
         }
         build(&postorder[..], &inorder[..])
     }
+
+    /**
+     * 889. 根据前序和后序遍历构造二叉树
+     * 给定两个整数数组，preorder 和 postorder ，
+     * 其中 preorder 是一个具有 无重复 值的二叉树的前序遍历，
+     * postorder 是同一棵树的后序遍历，重构并返回二叉树。
+     * 如果存在多个答案，您可以返回其中 任何 一个。
+     */
+    pub fn construct_from_pre_post(
+        preorder: Vec<i32>,
+        postorder: Vec<i32>,
+    ) -> Option<Rc<RefCell<TreeNode>>> {
+        fn build(preor: &[i32], postor: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
+            if preor.len() == 0 {
+                return None;
+            }
+            let mut root = TreeNode::new(preor[0]);
+            if let Some(left_root) = preor.get(1) {
+                let left_root_idx = (0..postor.len() - 1)
+                    .find(|idx| postor[*idx] == *left_root)
+                    .unwrap();
+                root.left = build(&preor[1..=left_root_idx + 1], &postor[0..=left_root_idx]);
+                if let Some(right_root) = preor.get(left_root_idx + 2) {
+                    root.right = build(
+                        &preor[left_root_idx + 2..],
+                        &postor[left_root_idx + 1..postor.len() - 1],
+                    );
+                }
+            }
+            Some(Rc::new(RefCell::new(root)))
+        }
+        build(&preorder[..], &postorder[..])
+    }
 }
 
 #[cfg(test)]
