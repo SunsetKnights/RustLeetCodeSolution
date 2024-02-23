@@ -519,6 +519,41 @@ impl Solution {
         }
         build(&preorder[..], &postorder[..])
     }
+
+    /**
+     * 2583. 二叉树中的第 K 大层和
+     * 给你一棵二叉树的根节点 root 和一个正整数 k 。
+     * 树中的 层和 是指 同一层 上节点值的总和。
+     * 返回树中第 k 大的层和（不一定不同）。如果树少于 k 层，则返回 -1 。
+     * 注意，如果两个节点与根节点的距离相同，则认为它们在同一层。
+     */
+    pub fn kth_largest_level_sum(root: Option<Rc<RefCell<TreeNode>>>, k: i32) -> i64 {
+        use std::cmp::Reverse;
+        use std::collections::VecDeque;
+        let mut level_sum = Vec::new();
+        let mut queue = VecDeque::new();
+        queue.push_back(root.unwrap());
+        while !queue.is_empty() {
+            let mut curr_sum = 0;
+            for _ in 0..queue.len() {
+                let node = queue.pop_front().unwrap();
+                curr_sum += node.borrow().val as i64;
+                if let Some(left) = node.borrow_mut().left.take() {
+                    queue.push_back(left);
+                };
+                if let Some(right) = node.borrow_mut().right.take() {
+                    queue.push_back(right);
+                };
+            }
+            level_sum.push(Reverse(curr_sum));
+        }
+        level_sum.sort_unstable();
+        if let Some(ret) = level_sum.get(k as usize - 1) {
+            ret.0
+        } else {
+            -1
+        }
+    }
 }
 
 #[cfg(test)]
