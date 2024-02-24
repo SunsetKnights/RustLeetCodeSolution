@@ -554,6 +554,44 @@ impl Solution {
             -1
         }
     }
+
+    /**
+     * 2476. 二叉搜索树最近节点查询
+     * 给你一个 二叉搜索树 的根节点 root ，和一个由正整数组成、长度为 n 的数组 queries 。
+     * 请你找出一个长度为 n 的 二维 答案数组 answer ，其中 answer[i] = [mini, maxi] ：
+     *     mini 是树中小于等于 queries[i] 的 最大值 。如果不存在这样的值，则使用 -1 代替。
+     *     maxi 是树中大于等于 queries[i] 的 最小值 。如果不存在这样的值，则使用 -1 代替。
+     * 返回数组 answer 。
+     */
+    pub fn closest_nodes(root: Option<Rc<RefCell<TreeNode>>>, queries: Vec<i32>) -> Vec<Vec<i32>> {
+        fn inorder(node: Option<Rc<RefCell<TreeNode>>>, arr: &mut Vec<i32>) {
+            if let Some(n) = node {
+                inorder(n.borrow_mut().left.take(), arr);
+                arr.push(n.borrow().val);
+                inorder(n.borrow_mut().right.take(), arr);
+            }
+        }
+        let mut arr = Vec::new();
+        inorder(root, &mut arr);
+        let mut ret = Vec::new();
+        for q in queries {
+            let idx = arr.partition_point(|&v| v < q);
+            if idx == arr.len() {
+                ret.push(vec![arr[idx - 1], -1]);
+            } else {
+                if arr[idx] == q {
+                    ret.push(vec![q, q]);
+                    continue;
+                }
+                if idx == 0 {
+                    ret.push(vec![-1, arr[idx]]);
+                } else {
+                    ret.push(vec![arr[idx - 1], arr[idx]]);
+                }
+            }
+        }
+        ret
+    }
 }
 
 #[cfg(test)]
