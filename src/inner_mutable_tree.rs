@@ -325,22 +325,24 @@ impl Solution {
         p: Option<Rc<RefCell<TreeNode>>>,
         q: Option<Rc<RefCell<TreeNode>>>,
     ) -> Option<Rc<RefCell<TreeNode>>> {
-        // p < q
-        fn dfs(node: Rc<RefCell<TreeNode>>, p: i32, q: i32) -> Option<Rc<RefCell<TreeNode>>> {
-            if node.borrow().val < p {
-                dfs(Rc::clone(node.borrow().right.as_ref().unwrap()), p, q)
-            } else if node.borrow().val > q {
-                dfs(Rc::clone(node.borrow().left.as_ref().unwrap()), p, q)
-            } else {
-                Some(node)
-            }
-        }
+        let mut ret = root.unwrap();
         let mut p = p.unwrap().borrow().val;
         let mut q = q.unwrap().borrow().val;
         if p > q {
             std::mem::swap(&mut p, &mut q);
         }
-        dfs(root.unwrap(), p, q)
+        loop {
+            if p > ret.borrow().val {
+                let temp = Rc::clone(ret.borrow().right.as_ref().unwrap());
+                ret = temp;
+            } else if q < ret.borrow().val {
+                let temp = Rc::clone(ret.borrow().left.as_ref().unwrap());
+                ret = temp;
+            } else {
+                break;
+            }
+        }
+        Some(ret)
     }
 
     /**
