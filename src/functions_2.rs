@@ -244,4 +244,122 @@ impl Solution {
         }
         result
     }
+
+    /**
+     * 204. 计数质数
+     * 给定整数 n ，返回 所有小于非负整数 n 的质数的数量 。
+     */
+    pub fn count_primes(n: i32) -> i32 {
+        let mut primes = Vec::new();
+        let mut flags = vec![true; n as usize + 1];
+        for i in 2..=n as usize {
+            if flags[i] {
+                primes.push(i);
+            }
+            for &p in primes.iter() {
+                if p * i > n as usize {
+                    break;
+                }
+                flags[p * i] = false;
+                if i % p == 0 {
+                    break;
+                }
+            }
+        }
+        primes.len() as i32
+    }
+
+    /**
+     * 给你一棵 n 个节点的无向树，节点编号为 1 到 n 。
+     * 给你一个整数 n 和一个长度为 n - 1 的二维整数数组 edges ，其中 edges[i] = [ui, vi] 表示节点 ui 和 vi 在树中有一条边。
+     * 请你返回树中的 合法路径数目 。
+     * 如果在节点 a 到节点 b 之间 恰好有一个 节点的编号是质数，那么我们称路径 (a, b) 是 合法的 。
+     * 注意：
+     *     路径 (a, b) 指的是一条从节点 a 开始到节点 b 结束的一个节点序列，序列中的节点 互不相同 ，且相邻节点之间在树上有一条边。
+     *     路径 (a, b) 和路径 (b, a) 视为 同一条 路径，且只计入答案 一次 。
+     */
+    pub fn count_paths(n: i32, edges: Vec<Vec<i32>>) -> i64 {
+        // 找素数，欧拉筛
+        let mut primes = Vec::new();
+        let mut is_primes = vec![true; n as usize + 1];
+        is_primes[1] = false;
+        for i in 2..=n {
+            if is_primes[i as usize] {
+                primes.push(i);
+            }
+            for &p in primes.iter() {
+                if p * i > n {
+                    break;
+                }
+                is_primes[(p * i) as usize] = false;
+                if i % p == 0 {
+                    break;
+                }
+            }
+        }
+        // 建图
+        let mut g = vec![vec![]; n as usize + 1];
+        for e in edges {
+            g[e[0] as usize].push(e[1]);
+            g[e[1] as usize].push(e[0]);
+        }
+        // 统计不含质数的子图节点
+        fn dfs(
+            g: &Vec<Vec<i32>>,
+            from: i32,
+            curr: i32,
+            is_primes: &Vec<bool>,
+            curr_g: &mut Vec<i32>,
+        ) {
+            curr_g.push(curr);
+            for &e in g[curr as usize].iter() {
+                if !is_primes[e as usize] && e != from {
+                    dfs(g, curr, e, is_primes, curr_g);
+                }
+            }
+        }
+        let mut child_g = Vec::new();
+        let mut child_g_sizes = vec![0; n as usize + 1];
+        let mut ret = 0;
+        for p in primes {
+            // 求所有邻接且不包含质数的子图的大小
+            let adj = &g[p as usize];
+            for &e in adj {
+                if child_g_sizes[e as usize] == 0 && !is_primes[e as usize] {
+                    dfs(&g, p, e, &is_primes, &mut child_g);
+                    for &n in child_g.iter() {
+                        child_g_sizes[n as usize] = child_g.len() as i32;
+                    }
+                    child_g.clear();
+                }
+            }
+            let mut front_sum = 0;
+            for i in 0..adj.len() {
+                ret += front_sum * child_g_sizes[adj[i] as usize] as i64;
+                front_sum += child_g_sizes[adj[i] as usize] as i64;
+            }
+            ret += front_sum;
+        }
+        ret
+    }
+
+    /**
+     * 2673. 使二叉树所有路径值相等的最小代价
+     * 给你一个整数 n 表示一棵 满二叉树 里面节点的数目，节点编号从 1 到 n 。
+     * 根节点编号为 1 ，树中每个非叶子节点 i 都有两个孩子，分别是左孩子 2 * i 和右孩子 2 * i + 1 。
+     * 树中每个节点都有一个值，用下标从 0 开始、长度为 n 的整数数组 cost 表示，
+     * 其中 cost[i] 是第 i + 1 个节点的值。每次操作，你可以将树中 任意 节点的值 增加 1 。你可以执行操作 任意 次。
+     * 你的目标是让根到每一个 叶子结点 的路径值相等。请你返回 最少 需要执行增加操作多少次。
+     * 注意：
+     *     满二叉树 指的是一棵树，它满足树中除了叶子节点外每个节点都恰好有 2 个子节点，且所有叶子节点距离根节点距离相同。
+     *     路径值 指的是路径上所有节点的值之和。
+     */
+    pub fn min_increments(n: i32, mut cost: Vec<i32>) -> i32 {
+        let mut ret = 0;
+        for i in (0..cost.len() / 2).rev() {
+            ret += (cost[i * 2 + 1] - cost[i * 2 + 2]).abs();
+            cost[i] += cost[i * 2 + 1].max(cost[i * 2 + 2]);
+        }
+        ret
+    }
 }
