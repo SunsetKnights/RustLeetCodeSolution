@@ -418,4 +418,85 @@ impl Solution {
         slove(&g, 0, 0, n, &mut distance, &sub_tree_size);
         distance
     }
+
+    /**
+     * 2581. 统计可能的树根数目
+     * Alice 有一棵 n 个节点的树，节点编号为 0 到 n - 1 。
+     * 树用一个长度为 n - 1 的二维整数数组 edges 表示，其中 edges[i] = [ai, bi] ，表示树中节点 ai 和 bi 之间有一条边。
+     * Alice 想要 Bob 找到这棵树的根。她允许 Bob 对这棵树进行若干次 猜测 。每一次猜测，Bob 做如下事情：
+     *     选择两个 不相等 的整数 u 和 v ，且树中必须存在边 [u, v] 。
+     *     Bob 猜测树中 u 是 v 的 父节点 。
+     * Bob 的猜测用二维整数数组 guesses 表示，其中 guesses[j] = [uj, vj] 表示 Bob 猜 uj 是 vj 的父节点。
+     * Alice 非常懒，她不想逐个回答 Bob 的猜测，只告诉 Bob 这些猜测里面 至少 有 k 个猜测的结果为 true 。
+     * 给你二维整数数组 edges ，Bob 的所有猜测和整数 k ，请你返回可能成为树根的 节点数目 。如果没有这样的树，则返回 0。
+     */
+    pub fn root_count(edges: Vec<Vec<i32>>, guesses: Vec<Vec<i32>>, k: i32) -> i32 {
+        // 建图
+        use std::collections::HashMap;
+        let mut g = vec![vec![]; edges.len() + 1];
+        for e in edges {
+            g[e[0] as usize].push(e[1]);
+            g[e[1] as usize].push(e[0]);
+        }
+        let mut map = HashMap::with_capacity(guesses.len());
+        for guess in guesses {
+            let v = map.entry(guess[0]).or_insert(Vec::new());
+            v.push(guess[1]);
+        }
+        // 获取以0为根节点时，猜测正确的数量
+        let is_guess_match = |u: i32, v: i32| {
+            if map.get(&u).is_some_and(|vec| vec.contains(&v)) {
+                true
+            } else {
+                false
+            }
+        };
+        fn get_matched(
+            g: &Vec<Vec<i32>>,
+            curr: i32,
+            from: i32,
+            matched: &mut i32,
+            is_guess_match: &impl Fn(i32, i32) -> bool,
+        ) {
+            if is_guess_match(from, curr) {
+                *matched += 1;
+            }
+            for &n in &g[curr as usize] {
+                if n != from {
+                    get_matched(g, n, curr, matched, is_guess_match);
+                }
+            }
+        }
+        let mut matched = 0;
+        get_matched(&g, 0, 0, &mut matched, &is_guess_match);
+        // 求猜测正确数量为k的根节点个数
+        fn slove(
+            g: &Vec<Vec<i32>>,
+            curr: i32,
+            from: i32,
+            matched: i32,
+            k: i32,
+            result: &mut i32,
+            is_guess_match: &impl Fn(i32, i32) -> bool,
+        ) {
+            let mut curr_matched = matched;
+            if is_guess_match(curr, from) {
+                curr_matched += 1;
+            }
+            if is_guess_match(from, curr) {
+                curr_matched -= 1;
+            }
+            if curr_matched >= k {
+                *result += 1;
+            }
+            for &n in &g[curr as usize] {
+                if n != from {
+                    slove(g, n, curr, curr_matched, k, result, is_guess_match);
+                }
+            }
+        }
+        let mut ret = 0;
+        slove(&g, 0, 0, matched, k, &mut ret, &is_guess_match);
+        ret
+    }
 }
