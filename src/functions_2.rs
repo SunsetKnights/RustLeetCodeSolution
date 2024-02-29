@@ -362,4 +362,60 @@ impl Solution {
         }
         ret
     }
+
+    /**
+     * 834. 树中距离之和
+     * 给定一个无向、连通的树。树中有 n 个标记为 0...n-1 的节点以及 n-1 条边 。
+     * 给定整数 n 和数组 edges ， edges[i] = [ai, bi]表示树中的节点 ai 和 bi 之间有一条边。
+     * 返回长度为 n 的数组 answer ，其中 answer[i] 是树中第 i 个节点与所有其他节点之间的距离之和。
+     */
+    pub fn sum_of_distances_in_tree(n: i32, edges: Vec<Vec<i32>>) -> Vec<i32> {
+        // 建图
+        let mut g = vec![vec![]; n as usize];
+        for e in edges {
+            g[e[0] as usize].push(e[1]);
+            g[e[1] as usize].push(e[0]);
+        }
+        // 以0为根，求各节点到0的距离之和，以及各节点的子树大小
+        fn dfs(
+            g: &Vec<Vec<i32>>,
+            curr: i32,
+            from: i32,
+            curr_distance: i32,
+            sub_tree_size: &mut Vec<i32>,
+        ) -> i32 {
+            let mut ret = curr_distance;
+            for &n in &g[curr as usize] {
+                if n != from {
+                    ret += dfs(g, n, curr, curr_distance + 1, sub_tree_size);
+                    sub_tree_size[curr as usize] += sub_tree_size[n as usize];
+                }
+            }
+            sub_tree_size[curr as usize] += 1;
+            ret
+        }
+        let mut distance = vec![0; n as usize];
+        let mut sub_tree_size = vec![0; n as usize];
+        distance[0] = dfs(&g, 0, 0, 0, &mut sub_tree_size);
+
+        // 求结果
+        fn slove(
+            g: &Vec<Vec<i32>>,
+            curr: i32,
+            from: i32,
+            tree_size: i32,
+            distance: &mut Vec<i32>,
+            sub_tree_size: &Vec<i32>,
+        ) {
+            for &n in &g[curr as usize] {
+                if n != from {
+                    distance[n as usize] =
+                        distance[curr as usize] + tree_size - sub_tree_size[n as usize] * 2;
+                    slove(g, n, curr, tree_size, distance, sub_tree_size);
+                }
+            }
+        }
+        slove(&g, 0, 0, n, &mut distance, &sub_tree_size);
+        distance
+    }
 }
