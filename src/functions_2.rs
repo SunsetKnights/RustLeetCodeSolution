@@ -589,4 +589,27 @@ impl Solution {
             })
             .collect()
     }
+
+    /**
+     * 2834. 找出美丽数组的最小和
+     * 给你两个正整数：n 和 target 。
+     * 如果数组 nums 满足下述条件，则称其为 美丽数组 。
+     *     nums.length == n.
+     *     nums 由两两互不相同的正整数组成。
+     *     在范围 [0, n-1] 内，不存在 两个 不同 下标 i 和 j ，使得 nums[i] + nums[j] == target 。
+     * 返回符合条件的美丽数组所可能具备的 最小 和，并对结果进行取模 109 + 7。
+     */
+    pub fn minimum_possible_sum(n: i32, target: i32) -> i32 {
+        let mod_ = 1_000_000_007;
+        let mid = (target / 2) as i64;
+        if n as i64 <= mid {
+            let sum_less = (1 + n as i64) * n as i64 / 2;
+            (sum_less % mod_) as i32
+        } else {
+            let sum_less = (1 + mid) * mid / 2;
+            let sum_more =
+                (n as i64 - mid) * (n as i64 - mid - 1) / 2 + (n as i64 - mid) * target as i64;
+            ((sum_less + sum_more) % mod_) as i32
+        }
+    }
 }
