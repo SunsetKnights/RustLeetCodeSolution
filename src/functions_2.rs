@@ -612,4 +612,38 @@ impl Solution {
             ((sum_less + sum_more) % mod_) as i32
         }
     }
+
+    /**
+     * 2386. 找出数组的第 K 大和
+     * 给你一个整数数组 nums 和一个 正 整数 k 。你可以选择数组的任一 子序列 并且对其全部元素求和。
+     * 数组的 第 k 大和 定义为：可以获得的第 k 个 最大 子序列和（子序列和允许出现重复）
+     * 返回数组的 第 k 大和 。
+     * 子序列是一个可以由其他数组删除某些或不删除元素排生而来的数组，且派生过程不改变剩余元素的顺序。
+     * 注意：空子序列的和视作 0 。
+     */
+    pub fn k_sum(mut nums: Vec<i32>, k: i32) -> i64 {
+        use std::collections::BinaryHeap;
+        let mut sum = 0;
+        for n in nums.iter_mut() {
+            if *n < 0 {
+                *n = (*n).abs();
+            } else {
+                sum += *n as i64;
+            }
+        }
+        nums.sort_unstable();
+        let mut heap = BinaryHeap::new();
+        // 最大和
+        heap.push((sum, 0));
+        for _ in 1..k {
+            let (curr_sum, i) = heap.pop().unwrap();
+            if i < nums.len() {
+                heap.push((curr_sum - nums[i] as i64, i + 1));
+                if i > 0 {
+                    heap.push((curr_sum + nums[i - 1] as i64 - nums[i] as i64, i + 1));
+                }
+            }
+        }
+        heap.pop().unwrap().0
+    }
 }
