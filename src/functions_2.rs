@@ -589,4 +589,92 @@ impl Solution {
             })
             .collect()
     }
+
+    /**
+     * 2834. 找出美丽数组的最小和
+     * 给你两个正整数：n 和 target 。
+     * 如果数组 nums 满足下述条件，则称其为 美丽数组 。
+     *     nums.length == n.
+     *     nums 由两两互不相同的正整数组成。
+     *     在范围 [0, n-1] 内，不存在 两个 不同 下标 i 和 j ，使得 nums[i] + nums[j] == target 。
+     * 返回符合条件的美丽数组所可能具备的 最小 和，并对结果进行取模 109 + 7。
+     */
+    pub fn minimum_possible_sum(n: i32, target: i32) -> i32 {
+        let mod_ = 1_000_000_007;
+        let mid = (target / 2) as i64;
+        if n as i64 <= mid {
+            let sum_less = (1 + n as i64) * n as i64 / 2;
+            (sum_less % mod_) as i32
+        } else {
+            let sum_less = (1 + mid) * mid / 2;
+            let sum_more =
+                (n as i64 - mid) * (n as i64 - mid - 1) / 2 + (n as i64 - mid) * target as i64;
+            ((sum_less + sum_more) % mod_) as i32
+        }
+    }
+
+    /**
+     * 2386. 找出数组的第 K 大和
+     * 给你一个整数数组 nums 和一个 正 整数 k 。你可以选择数组的任一 子序列 并且对其全部元素求和。
+     * 数组的 第 k 大和 定义为：可以获得的第 k 个 最大 子序列和（子序列和允许出现重复）
+     * 返回数组的 第 k 大和 。
+     * 子序列是一个可以由其他数组删除某些或不删除元素排生而来的数组，且派生过程不改变剩余元素的顺序。
+     * 注意：空子序列的和视作 0 。
+     */
+    pub fn k_sum(mut nums: Vec<i32>, k: i32) -> i64 {
+        use std::collections::BinaryHeap;
+        let mut sum = 0;
+        for n in nums.iter_mut() {
+            if *n < 0 {
+                *n = (*n).abs();
+            } else {
+                sum += *n as i64;
+            }
+        }
+        nums.sort_unstable();
+        let mut heap = BinaryHeap::new();
+        // 最大和
+        heap.push((sum, 0));
+        for _ in 1..k {
+            let (curr_sum, i) = heap.pop().unwrap();
+            if i < nums.len() {
+                heap.push((curr_sum - nums[i] as i64, i + 1));
+                if i > 0 {
+                    heap.push((curr_sum + nums[i - 1] as i64 - nums[i] as i64, i + 1));
+                }
+            }
+        }
+        heap.pop().unwrap().0
+    }
+
+    /**
+     * 299. 猜数字游戏
+     * 你在和朋友一起玩 猜数字（Bulls and Cows）游戏，该游戏规则如下：
+     * 写出一个秘密数字，并请朋友猜这个数字是多少。朋友每猜测一次，你就会给他一个包含下述信息的提示：
+     *     猜测数字中有多少位属于数字和确切位置都猜对了（称为 "Bulls"，公牛），
+     *     有多少位属于数字猜对了但是位置不对（称为 "Cows"，奶牛）。也就是说，这次猜测中有多少位非公牛数字可以通过重新排列转换成公牛数字。
+     * 给你一个秘密数字 secret 和朋友猜测的数字 guess ，请你返回对朋友这次猜测的提示。
+     * 提示的格式为 "xAyB" ，x 是公牛个数， y 是奶牛个数，A 表示公牛，B 表示奶牛。
+     * 请注意秘密数字和朋友猜测的数字都可能含有重复数字。
+     */
+    pub fn get_hint(secret: String, guess: String) -> String {
+        let mut hash = [0; 10];
+        let secret = secret.as_bytes();
+        let guess = guess.as_bytes();
+        let mut a = 0;
+        for i in 0..secret.len() {
+            if secret[i] == guess[i] {
+                a += 1;
+            }
+            hash[(secret[i] - '0' as u8) as usize] += 1;
+        }
+        let mut b = 0;
+        for i in 0..guess.len() {
+            if hash[(guess[i] - '0' as u8) as usize] > 0 {
+                hash[(guess[i] - '0' as u8) as usize] -= 1;
+                b += 1;
+            }
+        }
+        format!("{a}A{}B", b - a)
+    }
 }
