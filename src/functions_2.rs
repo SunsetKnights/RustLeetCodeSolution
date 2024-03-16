@@ -725,4 +725,39 @@ impl Solution {
         }
         p[m as usize][n as usize]
     }
+
+    /**
+     * 2684. 矩阵中移动的最大次数
+     * 给你一个下标从 0 开始、大小为 m x n 的矩阵 grid ，矩阵由若干 正 整数组成。
+     * 你可以从矩阵第一列中的 任一 单元格出发，按以下方式遍历 grid ：
+     *     从单元格 (row, col) 可以移动到 (row - 1, col + 1)、(row, col + 1) 和 (row + 1, col + 1) 三个单元格中任一满足值 严格 大于当前单元格的单元格。
+     * 返回你在矩阵中能够 移动 的 最大 次数。
+     */
+    pub fn max_moves(grid: Vec<Vec<i32>>) -> i32 {
+        let mut memory = vec![vec![-1; grid[0].len()]; grid.len()];
+        fn dp(grid: &Vec<Vec<i32>>, row: usize, col: usize, memory: &mut Vec<Vec<i32>>) -> i32 {
+            if memory[row][col] != -1 {
+                return memory[row][col];
+            }
+            let mut curr_res = 0;
+            if col + 1 < grid[0].len() {
+                if row > 0 && grid[row - 1][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row - 1, col + 1, memory));
+                }
+                if grid[row][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row, col + 1, memory));
+                }
+                if row + 1 < grid.len() && grid[row + 1][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row + 1, col + 1, memory));
+                }
+            }
+            memory[row][col] = curr_res;
+            curr_res
+        }
+        let mut ret = 0;
+        for i in 0..grid.len() {
+            ret = ret.max(dp(&grid, i, 0, &mut memory));
+        }
+        ret
+    }
 }
