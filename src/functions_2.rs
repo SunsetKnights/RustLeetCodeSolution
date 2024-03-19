@@ -750,4 +750,99 @@ impl Solution {
         }
         ret
     }
+
+    /**
+     * 2684. 矩阵中移动的最大次数
+     * 给你一个下标从 0 开始、大小为 m x n 的矩阵 grid ，矩阵由若干 正 整数组成。
+     * 你可以从矩阵第一列中的 任一 单元格出发，按以下方式遍历 grid ：
+     *     从单元格 (row, col) 可以移动到 (row - 1, col + 1)、(row, col + 1) 和 (row + 1, col + 1) 三个单元格中任一满足值 严格 大于当前单元格的单元格。
+     * 返回你在矩阵中能够 移动 的 最大 次数。
+     */
+    pub fn max_moves(grid: Vec<Vec<i32>>) -> i32 {
+        let mut memory = vec![vec![-1; grid[0].len()]; grid.len()];
+        fn dp(grid: &Vec<Vec<i32>>, row: usize, col: usize, memory: &mut Vec<Vec<i32>>) -> i32 {
+            if memory[row][col] != -1 {
+                return memory[row][col];
+            }
+            let mut curr_res = 0;
+            if col + 1 < grid[0].len() {
+                if row > 0 && grid[row - 1][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row - 1, col + 1, memory));
+                }
+                if grid[row][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row, col + 1, memory));
+                }
+                if row + 1 < grid.len() && grid[row + 1][col + 1] > grid[row][col] {
+                    curr_res = curr_res.max(1 + dp(grid, row + 1, col + 1, memory));
+                }
+            }
+            memory[row][col] = curr_res;
+            curr_res
+        }
+        let mut ret = 0;
+        for i in 0..grid.len() {
+            ret = ret.max(dp(&grid, i, 0, &mut memory));
+        }
+        ret
+    }
+
+    /**
+     * 310. 最小高度树
+     * 树是一个无向图，其中任何两个顶点只通过一条路径连接。 换句话说，一个任何没有简单环路的连通图都是一棵树。
+     * 给你一棵包含 n 个节点的树，标记为 0 到 n - 1 。
+     * 给定数字 n 和一个有 n - 1 条无向边的 edges 列表（每一个边都是一对标签），
+     * 其中 edges[i] = [ai, bi] 表示树中节点 ai 和 bi 之间存在一条无向边。
+     * 可选择树中任何一个节点作为根。当选择节点 x 作为根节点时，设结果树的高度为 h 。
+     * 在所有可能的树中，具有最小高度的树（即，min(h)）被称为 最小高度树 。
+     * 请你找到所有的 最小高度树 并按 任意顺序 返回它们的根节点标签列表。
+     * 树的 高度 是指根节点和叶子节点之间最长向下路径上边的数量。
+     */
+    pub fn find_min_height_trees(n: i32, mut edges: Vec<Vec<i32>>) -> Vec<i32> {
+        let mut g = vec![vec![]; n as usize];
+        for e in edges {
+            g[e[0] as usize].push(e[1]);
+            g[e[1] as usize].push(e[0]);
+        }
+        fn dfs(g: &Vec<Vec<i32>>, node: i32, from: i32) -> (i32, i32) {
+            let mut max_distance = 0;
+            let mut max_node = node;
+            for &next in &g[node as usize] {
+                if next != from {
+                    let (m, n) = dfs(g, next, node);
+                    if m + 1 > max_distance {
+                        max_distance = m + 1;
+                        max_node = n;
+                    }
+                }
+            }
+            (max_distance, max_node)
+        }
+        let x = dfs(&g, 0, 0).1;
+        let y = dfs(&g, x, x).1;
+        let mut way = vec![];
+        fn find_way(
+            g: &Vec<Vec<i32>>,
+            node: i32,
+            from: i32,
+            target: i32,
+            way: &mut Vec<i32>,
+        ) -> bool {
+            if node == target {
+                way.push(node);
+                return true;
+            }
+            for &next in &g[node as usize] {
+                if next != from && find_way(g, next, node, target, way) {
+                    way.push(node);
+                    return true;
+                }
+            }
+            false
+        }
+        find_way(&g, x, x, y, &mut way);
+        match way.len() % 2 == 0 {
+            true => vec![way[way.len() / 2 - 1], way[way.len() / 2]],
+            false => vec![way[way.len() / 2]],
+        }
+    }
 }
