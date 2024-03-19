@@ -725,4 +725,29 @@ impl Solution {
         }
         p[m as usize][n as usize]
     }
+
+    /**
+     * 1793. 好子数组的最大分数
+     * 给你一个整数数组 nums （下标从 0 开始）和一个整数 k 。
+     * 一个子数组 (i, j) 的 分数 定义为 min(nums[i], nums[i+1], ..., nums[j]) * (j - i + 1) 。
+     * 一个 好 子数组的两个端点下标需要满足 i <= k <= j 。
+     * 请你返回 好 子数组的最大可能 分数 。
+     */
+    pub fn maximum_score(nums: Vec<i32>, k: i32) -> i32 {
+        let mut front = k as usize;
+        let mut back = k as usize;
+        let mut min = nums[k as usize];
+        let mut ret = min;
+        for _ in 0..nums.len() - 1 {
+            if back == nums.len() - 1 || (front > 0 && nums[front - 1] > nums[back + 1]) {
+                front -= 1;
+                min = min.min(nums[front]);
+            } else {
+                back += 1;
+                min = min.min(nums[back]);
+            }
+            ret = ret.max(min * ((back - front + 1) as i32));
+        }
+        ret
+    }
 }
