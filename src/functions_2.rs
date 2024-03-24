@@ -871,4 +871,38 @@ impl Solution {
         let pow_2_p = 1 << p as i64 % m;
         ((pow_2_p - 1) % m * mod_pow((pow_2_p - 2) % m, (pow_2_p >> 1) - 1, m) % m) as i32
     }
+
+    /**
+     * 322. 零钱兑换
+     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+     * 计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。
+     * 你可以认为每种硬币的数量是无限的。
+     */
+    pub fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
+        let mut memory = vec![-1; amount as usize + 1];
+        fn dp(coins: &Vec<i32>, amount: i32, memory: &mut Vec<i32>) -> i32 {
+            if amount == 0 {
+                return 0;
+            }
+            if amount < 0 {
+                return -1;
+            }
+            if memory[amount as usize] != -1 {
+                return memory[amount as usize];
+            }
+            let mut res = i32::MAX;
+            for coin in coins {
+                let next_res = dp(coins, amount - coin, memory);
+                if next_res >= 0 && next_res < res {
+                    res = next_res + 1;
+                }
+            }
+            memory[amount as usize] = res;
+            res
+        }
+        match dp(&coins, amount, &mut memory) {
+            i32::MAX => -1,
+            res => res,
+        }
+    }
 }
