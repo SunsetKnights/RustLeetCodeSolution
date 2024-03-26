@@ -871,4 +871,59 @@ impl Solution {
         let pow_2_p = 1 << p as i64 % m;
         ((pow_2_p - 1) % m * mod_pow((pow_2_p - 2) % m, (pow_2_p >> 1) - 1, m) % m) as i32
     }
+
+    /**
+     * 2617. 网格图中最少访问的格子数
+     * 给你一个下标从 0 开始的 m x n 整数矩阵 grid 。你一开始的位置在 左上角 格子 (0, 0) 。
+     * 当你在格子 (i, j) 的时候，你可以移动到以下格子之一：
+     *     满足 j < k <= grid[i][j] + j 的格子 (i, k) （向右移动），或者
+     *     满足 i < k <= grid[i][j] + i 的格子 (k, j) （向下移动）。
+     * 请你返回到达 右下角 格子 (m - 1, n - 1) 需要经过的最少移动格子数，如果无法到达右下角格子，请你返回 -1 。
+     */
+    pub fn minimum_visited_cells(grid: Vec<Vec<i32>>) -> i32 {
+        use std::cmp::Reverse;
+        use std::collections::BinaryHeap;
+        let mut col_heaps = vec![BinaryHeap::new(); grid[0].len()];
+        let mut row_heap = BinaryHeap::new();
+        let mut step = 0;
+        for (i, row) in grid.iter().enumerate() {
+            row_heap.clear();
+            for (j, &val) in row.iter().enumerate() {
+                // Pop out all nodes whose farthest reached col is smaller than the current col
+                while let Some(&(_, farthest)) = row_heap.peek() {
+                    if farthest < j {
+                        row_heap.pop();
+                    } else {
+                        break;
+                    }
+                }
+                let col_heap = col_heaps.get_mut(j).unwrap();
+                while let Some(&(_, farthest)) = col_heap.peek() {
+                    if farthest < i {
+                        col_heap.pop();
+                    } else {
+                        break;
+                    }
+                }
+                step = match i > 0 || j > 0 {
+                    true => i32::MAX,
+                    false => 1,
+                };
+                if let Some(&(Reverse(s), _)) = row_heap.peek() {
+                    step = s + 1;
+                }
+                if let Some(&(Reverse(s), _)) = col_heap.peek() {
+                    step = step.min(s + 1);
+                }
+                if val > 0 && step < i32::MAX {
+                    row_heap.push((Reverse(step), val as usize + j));
+                    col_heap.push((Reverse(step), val as usize + i));
+                }
+            }
+        }
+        match step {
+            i32::MAX => -1,
+            s => s,
+        }
+    }
 }
