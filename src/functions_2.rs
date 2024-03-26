@@ -926,4 +926,56 @@ impl Solution {
             s => s,
         }
     }
+
+    /**
+     * 322. 零钱兑换
+     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+     * 计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。
+     * 你可以认为每种硬币的数量是无限的。
+     */
+    pub fn coin_change(coins: Vec<i32>, amount: i32) -> i32 {
+        let mut memory = vec![-1; amount as usize + 1];
+        fn dp(coins: &Vec<i32>, amount: i32, memory: &mut Vec<i32>) -> i32 {
+            if amount == 0 {
+                return 0;
+            }
+            if amount < 0 {
+                return -1;
+            }
+            if memory[amount as usize] != -1 {
+                return memory[amount as usize];
+            }
+            let mut res = i32::MAX;
+            for coin in coins {
+                let next_res = dp(coins, amount - coin, memory);
+                if next_res >= 0 && next_res < res {
+                    res = next_res + 1;
+                }
+            }
+            memory[amount as usize] = res;
+            res
+        }
+        match dp(&coins, amount, &mut memory) {
+            i32::MAX => -1,
+            res => res,
+        }
+    }
+
+    /**
+     * 518. 零钱兑换 II
+     * 给你一个整数数组 coins 表示不同面额的硬币，另给一个整数 amount 表示总金额。
+     * 请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 0 。
+     * 假设每一种面额的硬币有无限个。
+     * 题目数据保证结果符合 32 位带符号整数。
+     */
+    pub fn change(amount: i32, coins: Vec<i32>) -> i32 {
+        let mut memory = vec![0; (amount + 1) as usize];
+        memory[0] = 1;
+        for c in coins {
+            for i in c..=amount {
+                memory[i as usize] += memory[(i - c) as usize];
+            }
+        }
+        memory[amount as usize]
+    }
 }
