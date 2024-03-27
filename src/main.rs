@@ -1,4 +1,5 @@
 mod functions_2;
+mod functions_3;
 mod inner_mutable_tree;
 
 fn main() {
