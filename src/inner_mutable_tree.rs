@@ -594,6 +594,38 @@ impl Solution {
         }
         ret
     }
+
+    /**
+     * 894. 所有可能的真二叉树
+     * 给你一个整数 n ，请你找出所有可能含 n 个节点的 真二叉树 ，并以列表形式返回。答案中每棵树的每个节点都必须符合 Node.val == 0 。
+     * 答案的每个元素都是一棵真二叉树的根节点。你可以按 任意顺序 返回最终的真二叉树列表。
+     * 真二叉树 是一类二叉树，树中每个节点恰好有 0 或 2 个子节点。
+     * 1 <= n <= 20
+     */
+    pub fn all_possible_fbt(n: i32) -> Vec<Option<Rc<RefCell<TreeNode>>>> {
+        if n & 1 == 0 {
+            return vec![];
+        }
+        let n = ((n + 1) / 2) as usize;
+        let mut res = vec![vec![]; n + 1];
+        res[1].push(Some(Rc::new(RefCell::new(TreeNode::new(0)))));
+        for i in 2..=n {
+            let mut curr_roots = vec![];
+            for j in 1..i {
+                for left in &res[j] {
+                    for right in &res[i - j] {
+                        curr_roots.push(Some(Rc::new(RefCell::new(TreeNode {
+                            val: 0,
+                            left: left.clone(),
+                            right: right.clone(),
+                        }))));
+                    }
+                }
+            }
+            res[i] = curr_roots;
+        }
+        res.pop().unwrap()
+    }
 }
 
 /**
@@ -608,11 +640,13 @@ impl Solution {
  *     bool find(int target) 判断目标值 target 是否存在于还原后的二叉树中并返回结果。
  */
 use std::collections::HashSet;
-struct FindElements {
+#[allow(unused)]
+pub struct FindElements {
     hash: HashSet<i32>,
 }
+#[allow(unused)]
 impl FindElements {
-    fn new(root: Option<Rc<RefCell<TreeNode>>>) -> Self {
+    pub fn new(root: Option<Rc<RefCell<TreeNode>>>) -> Self {
         let mut ret = Self {
             hash: HashSet::new(),
         };
@@ -631,7 +665,7 @@ impl FindElements {
         ret
     }
 
-    fn find(&self, target: i32) -> bool {
+    pub fn find(&self, target: i32) -> bool {
         self.hash.contains(&target)
     }
 }
