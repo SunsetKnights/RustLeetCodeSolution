@@ -114,4 +114,36 @@ impl Solution {
         }
         stack.len() == 1 && stack[0] == '#'
     }
+    /**
+     * 2192. 有向无环图中一个节点的所有祖先
+     * 给你一个正整数 n ，它表示一个 有向无环图 中节点的数目，节点编号为 0 到 n - 1 （包括两者）。
+     * 给你一个二维整数数组 edges ，其中 edges[i] = [fromi, toi] 表示图中一条从 fromi 到 toi 的单向边。
+     * 请你返回一个数组 answer，其中 answer[i]是第 i 个节点的所有 祖先 ，这些祖先节点 升序 排序。
+     * 如果 u 通过一系列边，能够到达 v ，那么我们称节点 u 是节点 v 的 祖先 节点。
+     */
+    pub fn get_ancestors(n: i32, edges: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+        let mut g = vec![vec![]; n as usize];
+        for e in edges {
+            g[e[1] as usize].push(e[0]);
+        }
+        fn dfs(g: &Vec<Vec<i32>>, curr: i32, visited: &mut Vec<bool>) {
+            for &next in &g[curr as usize] {
+                if !visited[next as usize] {
+                    visited[next as usize] = true;
+                    dfs(g, next, visited);
+                }
+            }
+        }
+        let mut res = vec![vec![]; n as usize];
+        for i in 0..n {
+            let mut visited = vec![false; n as usize];
+            dfs(&g, i, &mut visited);
+            for j in 0..n {
+                if visited[j as usize] {
+                    res[i as usize].push(j);
+                }
+            }
+        }
+        res
+    }
 }
