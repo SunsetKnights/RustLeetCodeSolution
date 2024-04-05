@@ -626,6 +626,34 @@ impl Solution {
         }
         res.pop().unwrap()
     }
+
+    /**
+     * 1026. 节点与其祖先之间的最大差值
+     * 给定二叉树的根节点 root，找出存在于 不同 节点 A 和 B 之间的最大值 V，其中 V = |A.val - B.val|，且 A 是 B 的祖先。
+     *（如果 A 的任何子节点之一为 B，或者 A 的任何子节点是 B 的祖先，那么我们认为 A 是 B 的祖先）
+     */
+    pub fn max_ancestor_diff(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn max_min_maxdiff(node: Option<Rc<RefCell<TreeNode>>>) -> (i32, i32, i32) {
+            let (mut max, mut min, mut max_diff) = (0, i32::MAX, 0);
+            if let Some(n) = node {
+                let curr_val = n.borrow().val;
+                max = curr_val;
+                min = curr_val;
+                let (left_max, left_min, left_max_diff) = max_min_maxdiff(n.borrow().left.clone());
+                let (right_max, right_min, right_max_diff) =
+                    max_min_maxdiff(n.borrow().right.clone());
+                min = min.min(left_min).min(right_min);
+                max = max.max(left_max).max(right_max);
+                max_diff = (curr_val - min)
+                    .abs()
+                    .max((curr_val - max).abs())
+                    .max(left_max_diff)
+                    .max(right_max_diff);
+            }
+            (max, min, max_diff)
+        }
+        max_min_maxdiff(root).2
+    }
 }
 
 /**
