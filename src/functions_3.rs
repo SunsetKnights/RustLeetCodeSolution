@@ -498,4 +498,92 @@ impl Solution {
         }
         result
     }
+    /**
+     * 928. 尽量减少恶意软件的传播 II
+     * 给定一个由 n 个节点组成的网络，用 n x n 个邻接矩阵 graph 表示。在节点网络中，只有当 graph[i][j] = 1 时，节点 i 能够直接连接到另一个节点 j。
+     * 一些节点 initial 最初被恶意软件感染。只要两个节点直接连接，且其中至少一个节点受到恶意软件的感染，那么两个节点都将被恶意软件感染。
+     * 这种恶意软件的传播将继续，直到没有更多的节点可以被这种方式感染。
+     * 假设 M(initial) 是在恶意软件停止传播之后，整个网络中感染恶意软件的最终节点数。
+     * 我们可以从 initial 中删除一个节点，并完全移除该节点以及从该节点到任何其他节点的任何连接。
+     * 请返回移除后能够使 M(initial) 最小化的节点。如果有多个节点满足条件，返回索引 最小的节点 。
+     */
+    pub fn min_malware_spread_ii(graph: Vec<Vec<i32>>, initial: Vec<i32>) -> i32 {
+        use std::collections::HashMap;
+        let n = graph.len();
+        let mut init_node = vec![false; n];
+        let mut result = initial[0];
+        for i in initial {
+            init_node[i as usize] = true;
+            result = result.min(i);
+        }
+        let mut g = vec![vec![]; n];
+        for (node, adj) in graph.iter().enumerate() {
+            for (next, &access) in adj.iter().enumerate() {
+                if access == 1 {
+                    g[node].push(next);
+                }
+            }
+        }
+        fn dfs(
+            curr: usize,
+            from: usize,
+            g: &Vec<Vec<usize>>,
+            visited: &mut Vec<bool>,
+            initial: &Vec<bool>,
+            block_size: &mut i32,
+            unique_init: &mut i32,
+        ) {
+            if initial[curr] {
+                if *unique_init == -1 {
+                    *unique_init = curr as i32;
+                } else if *unique_init >= 0 && *unique_init != curr as i32 {
+                    *unique_init = -2;
+                }
+            } else if !visited[curr] {
+                visited[curr] = true;
+                *block_size += 1;
+                for &next in &g[curr] {
+                    if next != from {
+                        dfs(next, curr, g, visited, initial, block_size, unique_init);
+                    }
+                }
+            }
+        }
+        let mut init_connect_block = HashMap::new();
+        let mut visited = vec![false; n];
+        for i in 0..n {
+            if !visited[i] {
+                let mut curr_block_size = 0;
+                let mut unique_init = -1;
+                if init_node[i] {
+                    curr_block_size = 1;
+                    unique_init = i as i32;
+                } else {
+                    dfs(
+                        i,
+                        i,
+                        &g,
+                        &mut visited,
+                        &init_node,
+                        &mut curr_block_size,
+                        &mut unique_init,
+                    );
+                }
+                if unique_init >= 0 {
+                    let count = init_connect_block.entry(unique_init).or_insert(0);
+                    *count += curr_block_size;
+                }
+            }
+        }
+        let mut max_block = 0;
+        init_connect_block.iter().for_each(|(&k, &v)| {
+            if v > max_block {
+                result = k;
+                max_block = v;
+            } else if v == max_block {
+                result = result.min(k);
+            }
+        });
+        result
+    }
 }

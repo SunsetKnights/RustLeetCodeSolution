@@ -3,5 +3,18 @@ mod functions_3;
 mod inner_mutable_tree;
 
 fn main() {
-    functions_2::Solution::find_min_height_trees(4, vec![vec![1, 0], vec![1, 2], vec![1, 3]]);
+    functions_3::Solution::min_malware_spread_ii(
+        vec![
+            vec![1, 0, 0, 0, 0, 0, 0, 0, 1],
+            vec![0, 1, 0, 1, 0, 0, 0, 0, 0],
+            vec![0, 0, 1, 1, 0, 1, 0, 0, 0],
+            vec![0, 1, 1, 1, 1, 0, 1, 0, 0],
+            vec![0, 0, 0, 1, 1, 1, 0, 0, 0],
+            vec![0, 0, 1, 0, 1, 1, 0, 0, 0],
+            vec![0, 0, 0, 1, 0, 0, 1, 1, 0],
+            vec![0, 0, 0, 0, 0, 0, 1, 1, 1],
+            vec![1, 0, 0, 0, 0, 0, 0, 1, 1],
+        ],
+        vec![3, 7],
+    );
 }
