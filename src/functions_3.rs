@@ -586,4 +586,47 @@ impl Solution {
         });
         result
     }
+    /**
+     * 2007. 从双倍数组中还原原数组
+     * 一个整数数组 original 可以转变成一个 双倍 数组 changed ，转变方式为将 original 中每个元素 值乘以 2 加入数组中，然后将所有元素 随机打乱 。
+     * 给你一个数组 changed ，如果 change 是 双倍 数组，那么请你返回 original数组，否则请返回空数组。original 的元素可以以 任意 顺序返回。
+     */
+    pub fn find_original_array(changed: Vec<i32>) -> Vec<i32> {
+        use std::collections::HashMap;
+        let mut count = HashMap::new();
+        for num in changed {
+            *count.entry(num).or_insert(0) += 1;
+        }
+        let mut res = vec![];
+        if let Some(c) = count.remove(&0) {
+            if c & 1 == 1 {
+                return vec![];
+            } else {
+                res.extend(std::iter::repeat(0).take(c / 2));
+            }
+        }
+        for mut num in count.keys().map(|&x| x).collect::<Vec<i32>>() {
+            if num & 1 == 0 && count.contains_key(&(num / 2)) {
+                continue;
+            }
+            while let Some(&c) = count.get(&num) {
+                let double_c = count.get_mut(&(num * 2));
+                if double_c.is_none() {
+                    return vec![];
+                }
+                let double_c = double_c.unwrap();
+                if *double_c < c {
+                    return vec![];
+                }
+                *double_c -= c;
+                res.extend(std::iter::repeat(num).take(c));
+                if *double_c != 0 {
+                    num *= 2;
+                } else {
+                    num *= 4;
+                }
+            }
+        }
+        res
+    }
 }
