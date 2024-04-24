@@ -654,6 +654,43 @@ impl Solution {
         }
         max_min_maxdiff(root).2
     }
+    /**
+     * 2385. 感染二叉树需要的总时间
+     * 给你一棵二叉树的根节点 root ，二叉树中节点的值 互不相同 。另给你一个整数 start 。在第 0 分钟，感染 将会从值为 start 的节点开始爆发。
+     * 每分钟，如果节点满足以下全部条件，就会被感染：
+     *     节点此前还没有感染。
+     *     节点与一个已感染节点相邻。
+     * 返回感染整棵树需要的分钟数。
+     */
+    pub fn amount_of_time(root: Option<Rc<RefCell<TreeNode>>>, start: i32) -> i32 {
+        fn dfs(node: Option<Rc<RefCell<TreeNode>>>, start: i32, res: &mut i32) -> i32 {
+            if node.is_none() {
+                return 0;
+            }
+            let node = node.unwrap();
+            let node = node.borrow();
+            let left_depth = dfs(node.left.clone(), start, res);
+            let right_depth = dfs(node.right.clone(), start, res);
+            if node.val == start {
+                *res = left_depth.max(right_depth);
+                return -1;
+            }
+            if left_depth < 0 {
+                let max_depth = right_depth - left_depth;
+                *res = (*res).max(max_depth);
+                return left_depth - 1;
+            } else if right_depth < 0 {
+                let max_depth = left_depth - right_depth;
+                *res = (*res).max(max_depth);
+                return right_depth - 1;
+            } else {
+                return left_depth.max(right_depth) + 1;
+            }
+        }
+        let mut res = 0;
+        dfs(root, start, &mut res);
+        res
+    }
 }
 
 /**
