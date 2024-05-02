@@ -753,4 +753,36 @@ impl Solution {
         }
         res
     }
+    /**
+     * 857. 雇佣 K 名工人的最低成本
+     * 有 n 名工人。 给定两个数组 quality 和 wage ，其中，quality[i] 表示第 i 名工人的工作质量，其最低期望工资为 wage[i] 。
+     * 现在我们想雇佣 k 名工人组成一个工资组。在雇佣 一组 k 名工人时，我们必须按照下述规则向他们支付工资：
+     *     对工资组中的每名工人，应当按其工作质量与同组其他工人的工作质量的比例来支付工资。
+     *     工资组中的每名工人至少应当得到他们的最低期望工资。
+     * 给定整数 k ，返回 组成满足上述条件的付费群体所需的最小金额 。在实际答案的 10^-5 以内的答案将被接受。
+     */
+    pub fn mincost_to_hire_workers(quality: Vec<i32>, wage: Vec<i32>, k: i32) -> f64 {
+        use std::collections::BinaryHeap;
+        let mut id = (0..quality.len()).collect::<Vec<_>>();
+        id.sort_unstable_by(|&a, &b| {
+            (wage[a] as f64 / quality[a] as f64).total_cmp(&(wage[b] as f64 / quality[b] as f64))
+        });
+        let mut qual_heap = BinaryHeap::new();
+        let mut qual_sum = 0;
+        for &idx in id.iter().take(k as usize) {
+            qual_heap.push(quality[idx]);
+            qual_sum += quality[idx];
+        }
+        let mut res = (qual_sum as f64)
+            * (wage[id[k as usize - 1]] as f64 / quality[id[k as usize - 1]] as f64);
+        for &idx in &id[k as usize..] {
+            let q = quality[idx];
+            if q < *qual_heap.peek().unwrap() {
+                qual_sum = qual_sum - qual_heap.pop().unwrap() + q;
+                qual_heap.push(q);
+                res = res.min((qual_sum as f64) * (wage[idx] as f64 / quality[idx] as f64));
+            }
+        }
+        res
+    }
 }
