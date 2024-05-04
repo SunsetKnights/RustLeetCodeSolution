@@ -3,5 +3,9 @@ mod functions_3;
 mod inner_mutable_tree;
 
 fn main() {
-    functions_3::Solution::total_cost(vec![17, 12, 10, 2, 7, 2, 11, 20, 8], 3, 4);
+    functions_3::Solution::job_scheduling(
+        vec![1, 2, 3, 4, 6],
+        vec![3, 5, 10, 6, 9],
+        vec![20, 20, 100, 70, 60],
+    );
 }
