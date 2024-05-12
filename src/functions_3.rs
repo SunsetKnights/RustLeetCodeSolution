@@ -855,4 +855,29 @@ impl Solution {
         }
         res
     }
+    /**
+     * 1553. 吃掉 N 个橘子的最少天数
+     * 厨房里总共有 n 个橘子，你决定每一天选择如下方式之一吃这些橘子：
+     *     吃掉一个橘子。
+     *     如果剩余橘子数 n 能被 2 整除，那么你可以吃掉 n/2 个橘子。
+     *     如果剩余橘子数 n 能被 3 整除，那么你可以吃掉 2*(n/3) 个橘子。
+     * 每天你只能从以上 3 种方案中选择一种方案。
+     * 请你返回吃掉所有 n 个橘子的最少天数。
+     */
+    pub fn min_days(n: i32) -> i32 {
+        use std::collections::HashMap;
+        let mut memory = HashMap::new();
+        fn dp(curr: i32, memory: &mut HashMap<i32, i32>) -> i32 {
+            if curr <= 1 {
+                return curr;
+            }
+            if let Some(&result) = memory.get(&curr) {
+                return result;
+            }
+            let result = (curr % 2 + dp(curr / 2, memory)).min(curr % 3 + dp(curr / 3, memory)) + 1;
+            memory.insert(curr, result);
+            result
+        }
+        dp(n, &mut memory)
+    }
 }
