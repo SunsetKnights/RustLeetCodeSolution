@@ -880,4 +880,35 @@ impl Solution {
         }
         dp(n, &mut memory)
     }
+    /**
+     * 2589. 完成所有任务的最少时间
+     * 你有一台电脑，它可以 同时 运行无数个任务。
+     * 给你一个二维整数数组 tasks ，其中 tasks[i] = [starti, endi, durationi] 表示
+     * 第 i 个任务需要在 闭区间 时间段 [starti, endi] 内运行 durationi 个整数时间点（但不需要连续）。
+     * 当电脑需要运行任务时，你可以打开电脑，如果空闲时，你可以将电脑关闭。
+     * 请你返回完成所有任务的情况下，电脑最少需要运行多少秒。
+     */
+    pub fn find_minimum_time(mut tasks: Vec<Vec<i32>>) -> i32 {
+        tasks.sort_unstable_by(|a, b| a[1].cmp(&b[1]));
+        let mut stack = vec![(-1, -1, 0)];
+        for task in tasks.iter() {
+            let start = task[0];
+            let end = task[1];
+            let mut duration = task[2];
+            let mut first_overlap = stack.partition_point(|x| x.0 < start) - 1;
+            duration -= stack.last().unwrap().2 - stack[first_overlap].2;
+            if start <= stack[first_overlap].1 {
+                duration -= stack[first_overlap].1 - start + 1;
+            }
+            if duration <= 0 {
+                continue;
+            }
+            while end - stack.last().unwrap().1 <= duration {
+                let (st, ed, _) = stack.pop().unwrap();
+                duration += ed - st + 1;
+            }
+            stack.push((end - duration + 1, end, stack.last().unwrap().2 + duration));
+        }
+        stack.last().unwrap().2
+    }
 }
