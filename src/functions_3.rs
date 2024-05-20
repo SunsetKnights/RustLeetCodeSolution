@@ -911,4 +911,34 @@ impl Solution {
         }
         stack.last().unwrap().2
     }
+    /**
+     * 1542. 找出最长的超赞子字符串
+     * 给你一个字符串 s 。请返回 s 中最长的 超赞子字符串 的长度。
+     * 「超赞子字符串」需满足满足下述两个条件：
+     *     该字符串是 s 的一个非空子字符串
+     *     进行任意次数的字符交换后，该字符串可以变成一个回文字符串
+     */
+    pub fn longest_awesome(s: String) -> i32 {
+        use std::collections::HashMap;
+        let mut location = HashMap::new();
+        let mut res = 0;
+        let mut status = 0;
+        location.insert(0, -1);
+        let s = s.as_bytes();
+        for i in 0..s.len() {
+            status ^= (1 << (s[i] - b'0') as i32);
+            for j in 0..10 {
+                let pre = status ^ (1 << j);
+                if let Some(&idx) = location.get(&pre) {
+                    res = res.max(i as i32 - idx);
+                }
+            }
+            if let Some(&idx) = location.get(&status) {
+                res = res.max(i as i32 - idx);
+            } else {
+                location.insert(status, i as i32);
+            }
+        }
+        res
+    }
 }
