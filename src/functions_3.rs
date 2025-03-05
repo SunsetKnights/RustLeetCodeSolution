@@ -1,3 +1,5 @@
+use std::result;
+
 pub struct Solution;
 #[allow(unused)]
 impl Solution {
@@ -940,5 +942,91 @@ impl Solution {
             }
         }
         res
+    }
+    /**
+     * 1328. 破坏回文串
+     * 给你一个由小写英文字母组成的回文字符串 palindrome ，
+     * 请你将其中一个字符用任意小写英文字母替换，使得结果字符串的字典序最小 ，且不是回文串。
+     * 请你返回结果字符串。如果无法做到，则返回一个空串 。
+     * 如果两个字符串长度相同，那么字符串 a 字典序比字符串 b 小可以这样定义：
+     * 在 a 和 b 出现不同的第一个位置上，字符串 a 中的字符严格小于 b 中的对应字符。
+     * 例如，"abcc” 字典序比 "abcd" 小，因为不同的第一个位置是在第四个字符，显然 'c' 比 'd' 小。
+     */
+    pub fn break_palindrome(mut palindrome: String) -> String {
+        let n = palindrome.len();
+        if n <= 1 {
+            return String::from("");
+        }
+        let char_arr = unsafe { palindrome.as_bytes_mut() };
+        for (idx, c) in char_arr.iter_mut().enumerate() {
+            if *c != 'a' as u8 && !(n % 2 == 1 && idx == n / 2) {
+                *c = 'a' as u8;
+                return String::from_utf8(char_arr.to_vec()).unwrap();
+            }
+        }
+        char_arr[char_arr.len() - 1] = 'b' as u8;
+        String::from_utf8(char_arr.to_vec()).unwrap()
+    }
+    /**
+     * 31. 下一个排列
+     * 给你一个整数数组 nums ，找出 nums 的下一个排列。
+     * 必须 原地 修改，只允许使用额外常数空间。
+     */
+    pub fn next_permutation(nums: &mut Vec<i32>) {
+        let n = nums.len();
+        let mut sorted_locate = 0usize;
+        for i in (1..n).rev() {
+            if nums[i] > nums[i - 1] {
+                sorted_locate = i;
+                break;
+            }
+        }
+        if sorted_locate == 0 {
+            nums.reverse();
+        } else {
+            let mut change_locate = sorted_locate;
+            for i in (sorted_locate..n).rev() {
+                if nums[i] > nums[sorted_locate - 1] {
+                    change_locate = i;
+                    break;
+                }
+            }
+            nums.swap(sorted_locate - 1, change_locate);
+            nums[sorted_locate..].reverse();
+        }
+    }
+    /**
+     * 157. 套餐内商品的排列顺序
+     * 某店铺将用于组成套餐的商品记作字符串 goods，其中 goods[i] 表示对应商品。请返回该套餐内所含商品的 全部排列方式 。
+     * 返回结果 无顺序要求，但不能含有重复的元素。
+     */
+    pub fn goods_order(mut goods: String) -> Vec<String> {
+        let n = goods.len();
+        let goods = unsafe { goods.as_bytes_mut() };
+        goods.sort_unstable();
+        let mut result = vec![String::from_utf8(goods.to_vec()).unwrap()];
+        let mut sorted_locate = 1;
+        while sorted_locate != 0 {
+            sorted_locate = 0;
+            for i in (1..n).rev() {
+                if goods[i] > goods[i - 1] {
+                    sorted_locate = i;
+                    break;
+                }
+            }
+            if sorted_locate != 0 {
+                let mut change_locate = sorted_locate;
+                for i in (sorted_locate..n).rev() {
+                    if goods[i] > goods[sorted_locate - 1] {
+                        change_locate = i;
+                        break;
+                    }
+                }
+                goods.swap(sorted_locate - 1, change_locate);
+                goods[sorted_locate..].reverse();
+                result.push(String::from_utf8(goods.to_vec()).unwrap());
+            }
+        }
+        result
     }
 }
