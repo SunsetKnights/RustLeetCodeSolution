@@ -1,7 +1,14 @@
-mod functions_2;
-mod functions_3;
-mod inner_mutable_tree;
+use lru_cache::LRUCache;
 
+mod lru_cache;
 fn main() {
-    functions_3::Solution::beautiful_subarrays(vec![4, 3, 1, 2, 4]);
+    let mut cache = LRUCache::new(2);
+    cache.put(2, 1);
+    cache.put(3, 2);
+    cache.get(3);
+    cache.get(2);
+    cache.put(4, 3);
+    cache.get(2);
+    cache.get(3);
+    cache.get(4);
 }

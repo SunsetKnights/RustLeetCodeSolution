@@ -1054,4 +1054,82 @@ impl Solution {
         }
         result
     }
+    /**
+     * 42. 接雨水
+     * 给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水
+     */
+    pub fn trap(height: Vec<i32>) -> i32 {
+        let n = height.len();
+        let mut stack = Vec::with_capacity(n);
+        stack.push(0);
+        let mut result = 0;
+        for i in 1..n {
+            while !stack.is_empty() && height[*stack.last().unwrap()] < height[i] {
+                let curr_heigh = height[stack.pop().unwrap()];
+                if let Some(&left) = stack.last() {
+                    let w = (i - left - 1) as i32;
+                    let h = height[left].min(height[i]) - curr_heigh;
+                    result += w * h;
+                }
+            }
+            stack.push(i);
+        }
+        result
+    }
+    /**
+     * 438. 找到字符串中所有字母异位词
+     * 给定两个字符串 s 和 p，找到 s 中所有 p 的
+     * 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+     */
+    pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
+        if p.len() > s.len() {
+            return Vec::new();
+        }
+        let s = s.as_bytes();
+        let p = p.as_bytes();
+        let p_n = p.len();
+        let mut sub_s_count = [0; 26];
+        let mut p_count = [0; 26];
+        for idx in 0..p_n {
+            sub_s_count[(s[idx] - 'a' as u8) as usize] += 1;
+            p_count[(p[idx] - 'a' as u8) as usize] += 1;
+        }
+        let mut result = Vec::new();
+        if sub_s_count == p_count {
+            result.push(0);
+        }
+        for idx in 1..(s.len() - p_n + 1) {
+            sub_s_count[(s[idx - 1] - 'a' as u8) as usize] -= 1;
+            sub_s_count[(s[idx + p_n - 1] - 'a' as u8) as usize] += 1;
+            if sub_s_count == p_count {
+                result.push(idx as i32);
+            }
+        }
+        result
+    }
+    /**
+     * 240. 搜索二维矩阵 II
+     * 编写一个高效的算法来搜索 m x n 矩阵 matrix 中的一个目标值 target 。该矩阵具有以下特性：
+     *     每行的元素从左到右升序排列。
+     *     每列的元素从上到下升序排列。
+     */
+    pub fn search_matrix(matrix: Vec<Vec<i32>>, target: i32) -> bool {
+        let mut m = 0;
+        let mut n = (&matrix[0]).len() - 1;
+        loop {
+            if matrix[m][n] < target {
+                if m == matrix.len() - 1 {
+                    return false;
+                }
+                m += 1;
+            } else if matrix[m][n] > target {
+                if n == 0 {
+                    return false;
+                }
+                n -= 1;
+            } else {
+                return true;
+            }
+        }
+    }
 }
