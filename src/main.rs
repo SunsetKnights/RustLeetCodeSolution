@@ -1,14 +1,11 @@
-use lru_cache::LRUCache;
-
+mod functions_4;
+mod inner_mutable_tree;
 mod lru_cache;
+
 fn main() {
-    let mut cache = LRUCache::new(2);
-    cache.put(2, 1);
-    cache.put(3, 2);
-    cache.get(3);
-    cache.get(2);
-    cache.put(4, 3);
-    cache.get(2);
-    cache.get(3);
-    cache.get(4);
+    inner_mutable_tree::Solution::max_path_sum(inner_mutable_tree::TreeNode::from_vec(vec![
+        Some(1),
+        Some(2),
+        Some(2),
+    ]));
 }

@@ -19,21 +19,21 @@ impl TreeNode {
         }
     }
 
-    pub fn create_from_vec(data: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
+    pub fn from_vec(data: Vec<Option<i32>>) -> Option<Rc<RefCell<TreeNode>>> {
         // i32::MAX means null
-        if data.is_empty() || data[0] == i32::MAX {
+        if data.is_empty() || data[0].is_none() {
             return None;
         }
         let mut queue = VecDeque::new();
-        let root = Rc::new(RefCell::new(Self::new(data[0])));
+        let root = Rc::new(RefCell::new(Self::new(*data[0].as_ref().unwrap())));
         queue.push_back(Rc::clone(&root));
         let mut curr_node = Rc::clone(&root);
         for idx in 1..data.len() {
             if idx & 1 == 1 {
                 curr_node = queue.pop_front().unwrap();
             }
-            if data[idx] != i32::MAX {
-                let child = Rc::new(RefCell::new(TreeNode::new(data[idx])));
+            if data[idx].is_some() {
+                let child = Rc::new(RefCell::new(TreeNode::new(*data[idx].as_ref().unwrap())));
                 queue.push_back(Rc::clone(&child));
                 if idx & 1 == 1 {
                     curr_node.borrow_mut().left = Some(child);
@@ -691,6 +691,234 @@ impl Solution {
         dfs(root, start, &mut res);
         res
     }
+    /**
+     * 543. 二叉树的直径
+     * 给你一棵二叉树的根节点，返回该树的 直径 。
+     * 二叉树的 直径 是指树中任意两个节点之间最长路径的 长度 。这条路径可能经过也可能不经过根节点 root 。
+     * 两节点之间路径的 长度 由它们之间边数表示。
+     */
+    pub fn diameter_of_binary_tree(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn deep_diameter(root: Option<Rc<RefCell<TreeNode>>>) -> (i32, i32) {
+            if root.is_none() {
+                return (0, 0);
+            }
+            let (l_deep, l_diameter) = deep_diameter(root.as_ref().unwrap().borrow().left.clone());
+            let (r_deep, r_diameter) = deep_diameter(root.as_ref().unwrap().borrow().right.clone());
+            (
+                l_deep.max(r_deep) + 1,
+                (l_deep + r_deep).max(l_diameter).max(r_diameter),
+            )
+        }
+        deep_diameter(root).1
+    }
+    /**
+     * 108. 将有序数组转换为二叉搜索树
+     * 给你一个整数数组 nums ，其中元素已经按 升序 排列，请你将其转换为一棵二叉搜索树。
+     */
+    pub fn sorted_array_to_bst(nums: Vec<i32>) -> Option<Rc<RefCell<TreeNode>>> {
+        fn convert(nums: &[i32]) -> Option<Rc<RefCell<TreeNode>>> {
+            let n = nums.len();
+            if n == 0 {
+                return None;
+            }
+            if n == 1 {
+                return Some(Rc::new(RefCell::new(TreeNode::new(nums[0]))));
+            }
+            let mid = n / 2;
+            let left = convert(&nums[..mid]);
+            let right = convert(&nums[mid + 1..]);
+            Some(Rc::new(RefCell::new(TreeNode {
+                val: nums[mid],
+                left,
+                right,
+            })))
+        }
+        convert(&nums[..])
+    }
+    /**
+     * 98. 验证二叉搜索树
+     * 给你一个二叉树的根节点 root ，判断其是否是一个有效的二叉搜索树。
+     * 有效 二叉搜索树定义如下：
+     * 节点的左子树只包含 小于 当前节点的数。
+     * 节点的右子树只包含 大于 当前节点的数。
+     * 所有左子树和右子树自身必须也是二叉搜索树。
+     */
+    pub fn is_valid_bst(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        fn check(front: &mut Option<i32>, root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+            if root.is_none() {
+                return true;
+            }
+            let node = root.as_ref().unwrap();
+            let l = check(front, node.borrow().left.clone());
+            if front.is_none() {
+                *front = Some(node.borrow().val);
+            } else if node.borrow().val <= *front.as_ref().unwrap() || !l {
+                return false;
+            }
+            *front = Some(node.borrow().val);
+            check(front, node.borrow().right.clone())
+        }
+        let mut front = None;
+        check(&mut front, root)
+    }
+    /**
+     * 199. 二叉树的右视图
+     * 给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值。
+     */
+    pub fn right_side_view(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+        let mut layer = Vec::new();
+        if let Some(r) = root {
+            layer.push(r);
+        }
+        let mut temp = Vec::new();
+        let mut result = Vec::new();
+        while !layer.is_empty() {
+            result.push(layer.last().unwrap().borrow().val);
+            for node in layer.iter() {
+                if let Some(l) = node.borrow_mut().left.take() {
+                    temp.push(l);
+                }
+                if let Some(r) = node.borrow_mut().right.take() {
+                    temp.push(r);
+                }
+            }
+            layer.clear();
+            std::mem::swap(&mut layer, &mut temp);
+        }
+        result
+    }
+    /**
+     * 114. 二叉树展开为链表
+     * 给你二叉树的根结点 root ，请你将它展开为一个单链表：
+     * 展开后的单链表应该同样使用 TreeNode ，其中 right 子指针指向链表中下一个结点，而左子指针始终为 null 。
+     * 展开后的单链表应该与二叉树 先序遍历 顺序相同。
+     */
+    pub fn flatten(root: &mut Option<Rc<RefCell<TreeNode>>>) {
+        if root.is_none() {
+            return;
+        }
+        fn nlr(node: Option<Rc<RefCell<TreeNode>>>, front: &mut Rc<RefCell<TreeNode>>) {
+            if node.is_none() {
+                return;
+            }
+            front.borrow_mut().right = node.clone();
+            *front = node.clone().unwrap();
+            let left = node.as_ref().unwrap().borrow_mut().left.take();
+            let right = node.as_ref().unwrap().borrow_mut().right.take();
+            nlr(left, front);
+            nlr(right, front);
+        }
+        let mut head = Rc::new(RefCell::new(TreeNode::new(0)));
+        let root = Some(root.as_ref().unwrap().clone());
+        nlr(root, &mut head);
+    }
+    /**
+     * 437. 路径总和 III
+     * 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
+     * 路径 不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
+     */
+    pub fn path_sum(root: Option<Rc<RefCell<TreeNode>>>, target_sum: i32) -> i32 {
+        use std::collections::HashMap;
+        fn dfs(
+            node: Option<Rc<RefCell<TreeNode>>>,
+            target_sum: i32,
+            result: &mut i32,
+            prefix: &mut HashMap<u64, i32>,
+            front_prefix: u64,
+        ) {
+            if node.is_none() {
+                return;
+            }
+            let val = node.as_ref().unwrap().borrow().val;
+            let curr_prefix = front_prefix + val as u64;
+            if let Some(&count) = prefix.get(&(curr_prefix - target_sum as u64)) {
+                *result += count;
+            }
+            prefix
+                .entry(curr_prefix)
+                .and_modify(|count| *count += 1)
+                .or_insert(1);
+            dfs(
+                node.as_ref().unwrap().borrow().left.clone(),
+                target_sum,
+                result,
+                prefix,
+                curr_prefix,
+            );
+            dfs(
+                node.as_ref().unwrap().borrow().right.clone(),
+                target_sum,
+                result,
+                prefix,
+                curr_prefix,
+            );
+            *prefix.get_mut(&curr_prefix).unwrap() -= 1;
+        }
+        let mut result = 0;
+        let mut prefix = HashMap::new();
+        prefix.insert(0, 1);
+        dfs(root, target_sum, &mut result, &mut prefix, 0);
+        result
+    }
+    /**
+     * 230. 二叉搜索树中第 K 小的元素
+     * 给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 小的元素（从 1 开始计数）。
+     */
+    pub fn kth_smallest(root: Option<Rc<RefCell<TreeNode>>>, k: i32) -> i32 {
+        fn dfs(
+            node: Option<Rc<RefCell<TreeNode>>>,
+            result: &mut Option<i32>,
+            count: &mut i32,
+            k: i32,
+        ) {
+            if node.is_none() || result.is_some() {
+                return;
+            }
+            dfs(
+                node.as_ref().unwrap().borrow().left.clone(),
+                result,
+                count,
+                k,
+            );
+            *count += 1;
+            if *count == k {
+                *result = Some(node.as_ref().unwrap().borrow().val);
+            }
+            dfs(
+                node.as_ref().unwrap().borrow().right.clone(),
+                result,
+                count,
+                k,
+            );
+        }
+        let mut result = None;
+        let mut count = 0;
+        dfs(root, &mut result, &mut count, k);
+        result.unwrap()
+    }
+    /**
+     * 124. 二叉树中的最大路径和
+     * 二叉树中的 路径 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。
+     * 同一个节点在一条路径序列中 至多出现一次（但节点值可以相同） 。该路径 至少包含一个 节点，且不一定经过根节点。
+     * 路径和 是路径中各节点值的总和。
+     * 给你一个二叉树的根节点 root ，返回其 最大路径和 。
+     */
+    pub fn max_path_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn max_path(node: Option<Rc<RefCell<TreeNode>>>, result: &mut Option<i32>) -> i32 {
+            if node.is_none() {
+                return 0;
+            }
+            let left = max_path(node.as_ref().unwrap().borrow().left.clone(), result);
+            let right = max_path(node.as_ref().unwrap().borrow().right.clone(), result);
+            let curr_val = node.as_ref().unwrap().borrow().val;
+            let curr_max = curr_val + left.max(0) + right.max(0);
+            *result = result.or(Some(curr_max)).map(|x| x.max(curr_max));
+            curr_val + left.max(right).max(0)
+        }
+        let mut result = None;
+        max_path(root, &mut result);
+        result.unwrap()
+    }
 }
 
 /**
@@ -742,8 +970,8 @@ mod tests {
 
     #[test]
     fn test_solution() {
-        let tree_val = [5, 4, 9, 1, 10, i32::MAX, 7];
-        let mut root = TreeNode::create_from_vec(tree_val.to_vec());
+        let tree_val = [Some(5), Some(4), Some(9), Some(1), Some(10), None, Some(7)];
+        let mut root = TreeNode::from_vec(tree_val.to_vec());
         root = Solution::replace_value_in_tree(root);
         let result = TreeNode::to_vec(root);
         assert_eq!(

@@ -66,6 +66,7 @@ impl Solution {
      * 请你将所有链表合并到一个升序链表中，返回合并后的链表。
      */
     pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
+        use std::collections::BinaryHeap;
         let mut node = None;
         let mut cur = &mut node;
         let mut heap = BinaryHeap::new();
@@ -81,6 +82,24 @@ impl Solution {
             cur = &mut cur.insert(x).next;
         }
         node
+    }
+    /**
+     * 148. 排序链表
+     * 给你链表的头结点 head ，请将其按 升序 排列并返回 排序后的链表 。
+     */
+    pub fn sort_list(mut head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        let mut addresses = vec![];
+        while head.is_some() {
+            let mut temp = head.unwrap();
+            head = temp.next.take();
+            addresses.push(temp);
+        }
+        addresses.sort_unstable_by(|a, b| b.val.cmp(&a.val));
+        for mut node in addresses {
+            node.next = head;
+            head = Some(node);
+        }
+        head
     }
 }
 
